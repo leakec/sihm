@@ -1,6 +1,6 @@
 package.json : 
 	yarn init -p -y
-	yarn add three webpack webpack-cli
+	yarn add three webpack webpack-cli canvas-sketch canvas-sketch-util glsl-noise glslify glslify-loader
 
 dist/main.js: src/index.js package.json
 	yarn webpack
