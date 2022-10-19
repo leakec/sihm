@@ -51,12 +51,12 @@ var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaterni
 
 //TODO: Fix this
 // setup the AnimationMixer
-//var mixer = new THREE.AnimationMixer( mesh );
-//
-//// create a ClipAction and set it to play
-//var clipAction = mixer.clipAction( clip );
-//clipAction.play();
-//
+var mixer = new THREE.AnimationMixer( sphere );
+
+// create a ClipAction and set it to play
+var clipAction = mixer.clipAction( clip );
+clipAction.play();
+
 //const clock = new THREE.Clock();
 
 // Render Loop
