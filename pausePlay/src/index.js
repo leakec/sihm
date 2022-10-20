@@ -12,7 +12,7 @@ const scene = new THREE.Scene();
 
 // Create camera
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-camera.position.z = 4;
+camera.position.z = 25;
 
 // Create geometry
 const geometry = new THREE.SphereGeometry( 1, 30, 30 );
@@ -57,13 +57,13 @@ var mixer = new THREE.AnimationMixer( sphere );
 var clipAction = mixer.clipAction( clip );
 clipAction.play();
 
-//const clock = new THREE.Clock();
+const clock = new THREE.Clock();
 
 // Render Loop
 var render = function () {
   requestAnimationFrame( render );
-//var delta = 0.75 * clock.getDelta();
-//mixer.update( delta );
+var delta = 0.75 * clock.getDelta();
+mixer.update( delta );
 // Your animated code goes here
 renderer.render(scene, camera);
 };
