@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GUI } from 'dat.gui'
+//import { GUI } from 'dat.gui'
+import { MyGui} from './gui'
 
 // create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
 // Note: the keyframe track type should correspond to the type of the property being animated
@@ -53,7 +54,8 @@ var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ],
 
 // create an animation sequence with the tracks
 // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
+var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
+clip.resetDuration()
 
 // setup the AnimationMixer
 var mixer = new THREE.AnimationMixer( sphere );
@@ -64,19 +66,18 @@ clipAction.play();
 
 // Create basic video functions and variables
 var paused = false;
-var time = 0.0;
 function pause_play() {
 	if (paused)
 	{
 		paused = false;
 		clock.start();
-		pausePlay.name("\u23F8");
+		gui.play();
 	} 
 	else
 	{
 		paused = true;
 		clock.stop();
-		pausePlay.name("\u25B6");
+		gui.pause();
 	}
 }
 function set_time(value) {
@@ -84,12 +85,16 @@ function set_time(value) {
 }
 
 // Create GUI
-const gui = new GUI()
-const video_controls = gui.addFolder('Video controls')
-var pausePlay = video_controls.add({"Pause/Play": pause_play}, "Pause/Play");
-var time_slider = video_controls.add({"Time": time}, "Time", 0.0, 2.0);
-time_slider.onChange(set_time);
-video_controls.open()
+const gui = new MyGui()
+gui.add_video_controls(pause_play, set_time, clip.duration)
+//const gui = new GUI()
+//const video_controls = gui.addFolder('Video controls')
+//var pausePlay = video_controls.add({"Pause/Play": pause_play}, "Pause/Play");
+//pausePlay.name("\u23F8")
+//var time_slider = video_controls.add({"Time": time}, "Time", 0.0, clip.duration);
+//time_slider.onChange(set_time);
+//video_controls.open()
+
 
 const clock = new THREE.Clock();
 
@@ -108,6 +113,7 @@ function animate() {
 		// Update animation
 		var delta = 0.75 * clock.getDelta();
 		mixer.update( delta );
+		gui.update_time(delta)
 	}
 }
 
