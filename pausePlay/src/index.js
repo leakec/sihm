@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-//import { GUI } from 'dat.gui'
 import { MyGui} from './gui'
 
 // create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
@@ -86,15 +85,7 @@ function set_time(value) {
 
 // Create GUI
 const gui = new MyGui()
-gui.add_video_controls(pause_play, set_time, clip.duration)
-//const gui = new GUI()
-//const video_controls = gui.addFolder('Video controls')
-//var pausePlay = video_controls.add({"Pause/Play": pause_play}, "Pause/Play");
-//pausePlay.name("\u23F8")
-//var time_slider = video_controls.add({"Time": time}, "Time", 0.0, clip.duration);
-//time_slider.onChange(set_time);
-//video_controls.open()
-
+gui.add_video_controls(pause_play, set_time, clipAction)
 
 const clock = new THREE.Clock();
 
@@ -113,7 +104,7 @@ function animate() {
 		// Update animation
 		var delta = 0.75 * clock.getDelta();
 		mixer.update( delta );
-		gui.update_time(delta)
+		gui.update_time()
 	}
 }
 

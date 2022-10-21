@@ -3,7 +3,7 @@ SRC_TS_FILES = $(wildcard src/*.ts)
 
 package.json : 
 	yarn init -p -y
-	yarn add three webpack webpack-cli
+	yarn add three webpack webpack-cli dat.gui
 
 dist/main.js: $(SRC_JS_FILES) $(SRC_TS_FILES) package.json
 	yarn webpack
