@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'dat.gui'
+
 // create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
 // Note: the keyframe track type should correspond to the type of the property being animated
 
@@ -18,6 +21,9 @@ camera.position.z = 25;
 const geometry = new THREE.SphereGeometry( 1, 30, 30 );
 const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 const sphere = new THREE.Mesh( geometry, material );
+
+// Create controls
+const controls = new OrbitControls( camera, renderer.domElement );
 
 // Add geometry to scene
 scene.add( sphere );
@@ -49,7 +55,6 @@ var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ],
 // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
 var clip = new THREE.AnimationClip( 'Action', 3, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
 
-//TODO: Fix this
 // setup the AnimationMixer
 var mixer = new THREE.AnimationMixer( sphere );
 
@@ -57,15 +62,54 @@ var mixer = new THREE.AnimationMixer( sphere );
 var clipAction = mixer.clipAction( clip );
 clipAction.play();
 
+// Create basic video functions and variables
+var paused = false;
+var time = 0.0;
+function pause_play() {
+	if (paused)
+	{
+		paused = false;
+		clock.start();
+		pausePlay.name("\u23F8");
+	} 
+	else
+	{
+		paused = true;
+		clock.stop();
+		pausePlay.name("\u25B6");
+	}
+}
+function set_time(value) {
+	mixer.setTime(value);
+}
+
+// Create GUI
+const gui = new GUI()
+const video_controls = gui.addFolder('Video controls')
+var pausePlay = video_controls.add({"Pause/Play": pause_play}, "Pause/Play");
+var time_slider = video_controls.add({"Time": time}, "Time", 0.0, 2.0);
+time_slider.onChange(set_time);
+video_controls.open()
+
 const clock = new THREE.Clock();
 
 // Render Loop
 var render = function () {
-  requestAnimationFrame( render );
-var delta = 0.75 * clock.getDelta();
-mixer.update( delta );
-// Your animated code goes here
-renderer.render(scene, camera);
+	// Render scene
+	requestAnimationFrame( render );
+	animate();
+	renderer.render(scene, camera);
 };
 
-render();
+// Animation
+function animate() {
+	if (!paused)
+	{
+		// Update animation
+		var delta = 0.75 * clock.getDelta();
+		mixer.update( delta );
+	}
+}
+
+controls.update()
+render()
