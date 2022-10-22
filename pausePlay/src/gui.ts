@@ -11,8 +11,8 @@ export class MyGui extends GUI {
   max_time: number;
 
   add_video_controls(
-    pause_play_func,
-    set_time_func,
+    pause_play_func: () => void,
+    set_time_func: () => void,
     clip_action: THREE.AnimationAction,
   ) {
     this.video_controls = this.addFolder("Video controls");
