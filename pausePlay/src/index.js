@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { MyGui} from './gui'
-
-// create a keyframe track (i.e. a timed sequence of keyframes) for each animated property
-// Note: the keyframe track type should correspond to the type of the property being animated
+import { MyMixer } from './animator'
 
 // Create renderer
 var renderer = new THREE.WebGLRenderer({antialias:true});
@@ -24,9 +22,6 @@ const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 const material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
 const sphere = new THREE.Mesh( geometry, material , name="sphere");
 const box = new THREE.Mesh( geometry2, material2 ,name="box");
-box.position.x = -3;
-box.position.y = 2;
-box.position.z = 0;
 
 // Create controls
 const controls = new OrbitControls( camera, renderer.domElement );
@@ -35,44 +30,34 @@ const controls = new OrbitControls( camera, renderer.domElement );
 scene.add(sphere);
 scene.add(box);
 
+// Create instance of mixer
+var mixer = new MyMixer(scene);
+
 const box_uuid = box.uuid;
 const sphere_uuid=sphere.uuid;
 
 // POSITION
-var positionKF2 = new THREE.VectorKeyframeTrack( box_uuid+'.position', [ 0, 1, 2], [ 0, 0, 0, -1, 0, 0, -2, 0, 0] );
-var positionKF = new THREE.VectorKeyframeTrack( sphere_uuid+'.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
+mixer.addKeyFrameTrack(new THREE.VectorKeyframeTrack( box_uuid+'.position', [ 0, 1], [ 0, 0, 0, -1, 0, 0] ));
+mixer.addKeyFrameTrack(new THREE.VectorKeyframeTrack( sphere_uuid+'.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] ));
 
 // SCALE
-var scaleKF = new THREE.VectorKeyframeTrack( sphere_uuid+'.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
+mixer.addKeyFrameTrack(new THREE.VectorKeyframeTrack( sphere_uuid+'.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] ));
 
 // ROTATION
-// Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
-// Interpolating Euler angles (.rotation property) can be problematic and is currently not supported
-
-// set up rotation about x axis
 var xAxis = new THREE.Vector3( 1, 0, 0 );
 
 var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
 var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
-var quaternionKF = new THREE.QuaternionKeyframeTrack( sphere_uuid+'.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+mixer.addKeyFrameTrack(new THREE.QuaternionKeyframeTrack( box_uuid+'.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] ));
 
 // COLOR
-var colorKF = new THREE.ColorKeyframeTrack( sphere_uuid+'.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
+mixer.addKeyFrameTrack(new THREE.ColorKeyframeTrack( sphere_uuid+'.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete ));
 
 // OPACITY
-var opacityKF = new THREE.NumberKeyframeTrack( sphere_uuid + '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+mixer.addKeyFrameTrack(new THREE.NumberKeyframeTrack( sphere_uuid + '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] ));
 
-// create an animation sequence with the tracks
-// If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF, positionKF2] );
-clip.resetDuration()
-
-// setup the AnimationMixer
-var mixer = new THREE.AnimationMixer(scene);
-
-// create a ClipAction and set it to play
-var clipAction = mixer.clipAction( clip );
-clipAction.play();
+// Lock the mixer (this generates the clip and clip action)
+mixer.lock();
 
 // Create basic video functions and variables
 var paused = false;
@@ -96,7 +81,7 @@ function set_time(value) {
 
 // Create GUI
 const gui = new MyGui()
-gui.add_video_controls(pause_play, set_time, clipAction)
+gui.add_video_controls(pause_play, set_time, mixer.clipAction)
 
 const clock = new THREE.Clock();
 
