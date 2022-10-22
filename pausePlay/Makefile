@@ -1,6 +1,7 @@
 SRC_JS_FILES = $(wildcard src/*.js)
 SRC_TS_FILES = $(wildcard src/*.ts)
-SRC_JS_FILES += $(SRC_TS_FILES:.ts=.js)
+CLEAN_JS_FILES = $(SRC_TS_FILES:.ts=.js)
+SRC_JS_FILES += $(CLEAN_JS_FILES)
 
 
 %.js: %.ts
@@ -8,9 +9,9 @@ SRC_JS_FILES += $(SRC_TS_FILES:.ts=.js)
 
 package.json : 
 	yarn init -p -y
-	yarn add three webpack webpack-cli dat.gui @types/three @types/dat.gui
+	yarn add three webpack webpack-cli dat.gui @types/three @types/dat.gui typescript
 
-dist/main.js: $(SRC_JS_FILES) $(SRC_TS_FILES) package.json
+dist/main.js: package.json $(SRC_JS_FILES) $(SRC_TS_FILES)
 	yarn webpack
 
 dist/index.html : dist/main.js
@@ -22,3 +23,4 @@ clean :
 	rm -f dist/index.html dist/main.*
 	rm -rf node_modules
 	rm -f yarn.lock package.json
+	rm -f $(CLEAN_JS_FILES)
