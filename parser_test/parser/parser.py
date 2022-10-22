@@ -1,8 +1,7 @@
 import yaml
 
-with open("test.yaml", 'r') as f:
+with open("test.yaml", "r") as f:
     data = yaml.safe_load(f)
-
 _beginning_boilerplate = """
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -104,20 +103,15 @@ with open("test.js", "w") as f:
         f.write(f"var {name}_uuid = {name}.uuid;\n\n")
 
         # Create animations
-        anim = obj.get("ANIMATIONS",None)
+        anim = obj.get("ANIMATIONS", None)
         if anim:
             f.write(f"// {name} animations\n")
         for track, args in anim.items():
             dark = ",".join([str(x) for x in args])
-            f.write(f"mixer.addKeyframeTrack(new THREE.VectorKeyframeTrack({name}_uuid + '.{track}', {dark}));\n")
+            f.write(
+                f"mixer.addKeyframeTrack(new THREE.VectorKeyframeTrack({name}_uuid + '.{track}', {dark}));\n"
+            )
         if anim:
             f.write("\n")
 
     f.write(_ending_boilerplate)
-
-
-
-
-
-
-
