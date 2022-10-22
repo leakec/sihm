@@ -1,5 +1,3 @@
 {
-  "files": [
-    "src/gui.ts"
-  ]
+  "files": ["test_ts/gui.ts"]
 }
