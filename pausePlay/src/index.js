@@ -19,20 +19,31 @@ camera.position.z = 25;
 
 // Create geometry
 const geometry = new THREE.SphereGeometry( 1, 30, 30 );
+const geometry2 = new THREE.BoxGeometry( 1, 1, 1, 4, 4, 4);
 const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-const sphere = new THREE.Mesh( geometry, material );
+const material2 = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+const sphere = new THREE.Mesh( geometry, material , name="sphere");
+const box = new THREE.Mesh( geometry2, material2 ,name="box");
+box.position.x = -3;
+box.position.y = 2;
+box.position.z = 0;
 
 // Create controls
 const controls = new OrbitControls( camera, renderer.domElement );
 
-// Add geometry to scene
-scene.add( sphere );
+// Add geometry to scene for anmiation
+scene.add(sphere);
+scene.add(box);
+
+const box_uuid = box.uuid;
+const sphere_uuid=sphere.uuid;
 
 // POSITION
-var positionKF = new THREE.VectorKeyframeTrack( '.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
+var positionKF2 = new THREE.VectorKeyframeTrack( box_uuid+'.position', [ 0, 1, 2], [ 0, 0, 0, -1, 0, 0, -2, 0, 0] );
+var positionKF = new THREE.VectorKeyframeTrack( sphere_uuid+'.position', [ 0, 1, 2 ], [ 0, 0, 0, 30, 0, 0, 0, 0, 0 ] );
 
 // SCALE
-var scaleKF = new THREE.VectorKeyframeTrack( '.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
+var scaleKF = new THREE.VectorKeyframeTrack( sphere_uuid+'.scale', [ 0, 1, 2 ], [ 1, 1, 1, 2, 2, 2, 1, 1, 1 ] );
 
 // ROTATION
 // Rotation should be performed using quaternions, using a QuaternionKeyframeTrack
@@ -43,21 +54,21 @@ var xAxis = new THREE.Vector3( 1, 0, 0 );
 
 var qInitial = new THREE.Quaternion().setFromAxisAngle( xAxis, 0 );
 var qFinal = new THREE.Quaternion().setFromAxisAngle( xAxis, Math.PI );
-var quaternionKF = new THREE.QuaternionKeyframeTrack( '.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
+var quaternionKF = new THREE.QuaternionKeyframeTrack( sphere_uuid+'.quaternion', [ 0, 1, 2 ], [ qInitial.x, qInitial.y, qInitial.z, qInitial.w, qFinal.x, qFinal.y, qFinal.z, qFinal.w, qInitial.x, qInitial.y, qInitial.z, qInitial.w ] );
 
 // COLOR
-var colorKF = new THREE.ColorKeyframeTrack( '.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
+var colorKF = new THREE.ColorKeyframeTrack( sphere_uuid+'.material.color', [ 0, 1, 2 ], [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ], THREE.InterpolateDiscrete );
 
 // OPACITY
-var opacityKF = new THREE.NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
+var opacityKF = new THREE.NumberKeyframeTrack( sphere_uuid + '.material.opacity', [ 0, 1, 2 ], [ 1, 0, 1 ] );
 
 // create an animation sequence with the tracks
 // If a negative time value is passed, the duration will be calculated from the times of the passed tracks array
-var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF ] );
+var clip = new THREE.AnimationClip( 'Action', -1, [ scaleKF, positionKF, quaternionKF, colorKF, opacityKF, positionKF2] );
 clip.resetDuration()
 
 // setup the AnimationMixer
-var mixer = new THREE.AnimationMixer( sphere );
+var mixer = new THREE.AnimationMixer(scene);
 
 // create a ClipAction and set it to play
 var clipAction = mixer.clipAction( clip );
