@@ -5,7 +5,7 @@ SRC_JS_FILES += $(CLEAN_JS_FILES)
 
 
 %.js: %.ts
-	yarn tsc $<
+	yarn tsc -t es6 $<
 
 package.json : 
 	yarn init -p -y
