@@ -4,7 +4,7 @@ CLEAN_JS_FILES = $(SRC_TS_FILES:.ts=.js)
 SRC_JS_FILES += $(CLEAN_JS_FILES)
 
 
-%.js: %.ts
+%.js: %.ts package.json
 	yarn tsc -t es6 $<
 
 package.json : 
