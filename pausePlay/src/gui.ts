@@ -1,4 +1,5 @@
 import { GUI, GUIController } from "dat.gui";
+import { MyCamera } from "./camera";
 import * as THREE from "three";
 
 export class MyGui extends GUI {
@@ -23,12 +24,21 @@ export class MyGui extends GUI {
     /** Duration of the action clip. */
     max_time: number;
 
+    /** This is the folder of camera controls. */
+    camera_controls: GUI;
+
+    /** The camera that is being controlled by the camera controls. */
+    camera: MyCamera;
+
+    /** Controls which object the camera is following. */
+    follow_control: GUIController;
+
     /** This method adds the video controls.
      * @param pause_play_func {() => void} A function used to pause/play the animation clip.
      * @param set_time_func {() => void} A function used to set the time of the anmiation clip.
      * @param clip_action {THREE.AnimationAction} The clip action that the video controls will control.
      */
-    add_video_controls(
+    addVideoControls(
         pause_play_func: () => void,
         set_time_func: () => void,
         clip_action: THREE.AnimationAction,
@@ -60,6 +70,41 @@ export class MyGui extends GUI {
         );
         this.time_slider.onChange(set_time_func);
         this.video_controls.open();
+    }
+
+    addCameraControls(camera: MyCamera) {
+        this.camera = camera;
+
+        this.camera_controls = this.addFolder("Camera controls");
+        var follow_obj = {};
+        follow_obj["None"] = -1;
+        this.camera.followable_objs.forEach(
+            (obj) => (follow_obj[obj.name] = obj.id),
+        );
+        this.follow_control = this.camera_controls.add(
+            { name: "Follow object" },
+            "name",
+            follow_obj,
+        );
+        var func = this.setCameraToFollow.bind(this); // Binding this to its method so we can pass it as a standalone function
+        this.follow_control.onChange(func);
+        this.follow_control.setValue(-1);
+    }
+
+    /**
+     * Sets the camera to follow the given object.
+     * @param id {number} The id of the object to follow.
+     */
+    setCameraToFollow(id: number) {
+        if (id < 0) {
+            this.camera.follow_obj = null;
+        } else {
+            // Need to call Math.trunc on this, otherwise a float gets passed in which leads to an undefined
+            // object.
+            this.camera.follow_obj = this.camera.scene.getObjectById(
+                Math.trunc(id),
+            );
+        }
     }
 
     /**

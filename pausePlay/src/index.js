@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { MyGui } from "./gui";
 import { MyMixer } from "./animator";
+import { MyCamera } from "./camera";
 
 // Create renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -12,13 +13,13 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 // Create camera
-var camera = new THREE.PerspectiveCamera(
+var camera_per = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     1000,
 );
-camera.position.z = 25;
+camera_per.position.z = 25;
 
 // Create geometry
 const geometry = new THREE.SphereGeometry(1, 30, 30);
@@ -31,14 +32,21 @@ const material2 = new THREE.MeshBasicMaterial({
 });
 
 const sphere = new THREE.Mesh(geometry, material);
+sphere.name = "sphere";
 const box = new THREE.Mesh(geometry2, material2);
+box.name = "box";
 
 // Create controls
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera_per, renderer.domElement);
 
 // Add geometry to scene for anmiation
 scene.add(sphere);
 scene.add(box);
+
+const camera = new MyCamera(scene, camera_per);
+
+// Add geometry to camera
+camera.addFollowableObjects([sphere, box]);
 
 // Create instance of mixer
 const mixer = new MyMixer(scene);
@@ -138,7 +146,8 @@ function set_time(value) {
 
 // Create GUI
 const gui = new MyGui();
-gui.add_video_controls(pause_play, set_time, mixer.clip_action);
+gui.addVideoControls(pause_play, set_time, mixer.clip_action);
+gui.addCameraControls(camera);
 
 const clock = new THREE.Clock();
 
@@ -147,7 +156,7 @@ var render = function () {
     // Render scene
     requestAnimationFrame(render);
     animate();
-    renderer.render(scene, camera);
+    renderer.render(scene, camera_per);
 };
 
 // Animation
@@ -157,8 +166,35 @@ function animate() {
         var delta = 0.75 * clock.getDelta();
         mixer.update(delta);
         gui.update_time();
+        camera.update();
+        //camera.lookAt(box.position); // Works for follow w/o change in rotation
+        //box.add(camera);
+
+        //var relativeCameraOffset = new THREE.Vector3(0,0,50);
+
+        //var cameraOffset = relativeCameraOffset.applyMatrix4( box.matrixWorld );
+
+        //camera.position.x = cameraOffset.x;
+        //camera.position.y = cameraOffset.y;
+        //camera.position.z = cameraOffset.z;
+        //camera.lookAt( box.position );
+        // See: https://stemkoski.github.io/Three.js/Chase-Camera.html
+        // See: http://stemkoski.github.io/Three.js/
     }
 }
 
 controls.update();
 render();
+
+// TESTING
+console.log("shpere: " + sphere.id);
+console.log("box :" + box.id);
+var obj = scene.getObjectById(box.id);
+console.log("obj " + obj);
+console.log("obj id:" + obj.id);
+
+console.log("shpere: " + sphere.id);
+console.log("box :" + box.id);
+var obj = camera.scene.getObjectById(box.id);
+console.log("obj " + obj);
+console.log("obj id:" + obj.id);
