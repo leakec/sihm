@@ -104,6 +104,10 @@ export class MyGui extends GUI {
             this.camera.follow_obj = this.camera.scene.getObjectById(
                 Math.trunc(id),
             );
+            this.camera.follow_obj_offset.subVectors(
+                this.camera.camera.position,
+                this.camera.follow_obj.position,
+            );
         }
     }
 

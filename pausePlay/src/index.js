@@ -24,7 +24,11 @@ camera_per.position.z = 25;
 // Create geometry
 const geometry = new THREE.SphereGeometry(1, 30, 30);
 const geometry2 = new THREE.BoxGeometry(1, 1, 1, 4, 4, 4);
-const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+const material = new THREE.MeshBasicMaterial({
+    color: 0xffff00,
+    wireframe: true,
+    wireframeLinewidth: 2,
+});
 const material2 = new THREE.MeshBasicMaterial({
     color: 0x00ff00,
     opacity: 0.5,
@@ -167,17 +171,7 @@ function animate() {
         mixer.update(delta);
         gui.update_time();
         camera.update();
-        //camera.lookAt(box.position); // Works for follow w/o change in rotation
-        //box.add(camera);
 
-        //var relativeCameraOffset = new THREE.Vector3(0,0,50);
-
-        //var cameraOffset = relativeCameraOffset.applyMatrix4( box.matrixWorld );
-
-        //camera.position.x = cameraOffset.x;
-        //camera.position.y = cameraOffset.y;
-        //camera.position.z = cameraOffset.z;
-        //camera.lookAt( box.position );
         // See: https://stemkoski.github.io/Three.js/Chase-Camera.html
         // See: http://stemkoski.github.io/Three.js/
     }
@@ -185,16 +179,3 @@ function animate() {
 
 controls.update();
 render();
-
-// TESTING
-console.log("shpere: " + sphere.id);
-console.log("box :" + box.id);
-var obj = scene.getObjectById(box.id);
-console.log("obj " + obj);
-console.log("obj id:" + obj.id);
-
-console.log("shpere: " + sphere.id);
-console.log("box :" + box.id);
-var obj = camera.scene.getObjectById(box.id);
-console.log("obj " + obj);
-console.log("obj id:" + obj.id);

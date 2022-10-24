@@ -13,6 +13,9 @@ export class MyCamera {
     /** Current object the camera is following. */
     follow_obj: THREE.Object3D = null;
 
+    /** Offset from object the camera is following. */
+    follow_obj_offset: THREE.Vector3 = new THREE.Vector3();
+
     /** Determines if an object is being followed. */
 
     /** Class constructor
@@ -42,6 +45,11 @@ export class MyCamera {
      */
     update() {
         if (this.follow_obj != null) {
+            this.camera.position.addVectors(
+                this.follow_obj.position,
+                this.follow_obj_offset,
+            );
+            this.camera.quaternion.equals(this.follow_obj.quaternion);
             this.camera.lookAt(this.follow_obj.position); // Works for follow w/o change in rotation
         }
     }
