@@ -33,6 +33,9 @@ export class MyGui extends GUI {
     /** Controls which object the camera is following. */
     follow_control: GUIController;
 
+	/** Real-time slider control. */
+	real_time_slider: GUIController;
+
     /** This method adds the video controls.
      * @param pause_play_func {() => void} A function used to pause/play the animation clip.
      * @param set_time_func {() => void} A function used to set the time of the anmiation clip.
@@ -59,6 +62,13 @@ export class MyGui extends GUI {
         this.loop_button = this.video_controls.add({ loop: func }, "loop");
         this.loop_button.name("\uD83D\uDD03");
         this.looping = true;
+
+		// Add a slider for real-time factor
+		this.real_time_slider = this.video_controls.add({ rt: 1.0 }, "rt", 0.01, 5.0)
+        var func2 = this.updateRealTimeFactor.bind(this); // Binding this to its method so we can pass it as a standalone function
+		this.real_time_slider.onChange(func2);
+		this.real_time_slider.name("Real time factor");
+		this.real_time_slider.setValue(1.0);
 
         // Add slider for time
         this.max_time = this.clip_action.getClip().duration;
@@ -110,6 +120,14 @@ export class MyGui extends GUI {
             );
         }
     }
+
+	/** 
+	 * This method changes the real-time factor of the animation mixer.
+	 * @param real_time_factor {number} Real-time factor.
+	 */
+	updateRealTimeFactor(real_time_factor: number) {
+		this.clip_action.setEffectiveTimeScale(real_time_factor);
+	}
 
     /**
      * This is called when the animation is paused.

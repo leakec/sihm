@@ -33,6 +33,8 @@ const material2 = new THREE.MeshBasicMaterial({
     color: 0x00ff00,
     opacity: 0.5,
     reflectivity: 0.5,
+    wireframe: true,
+    wireframeLinewidth: 2,
 });
 
 const sphere = new THREE.Mesh(geometry, material);
@@ -167,7 +169,7 @@ var render = function () {
 function animate() {
     if (!paused) {
         // Update animation
-        var delta = 0.75 * clock.getDelta();
+        var delta = clock.getDelta();
         mixer.update(delta);
         gui.update_time();
         camera.update();
