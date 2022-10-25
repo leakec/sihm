@@ -36,6 +36,12 @@ export class MyGui extends GUI {
 	/** Real-time slider control. */
 	real_time_slider: GUIController;
 
+    /** Controls whether the camera rotates with the object or not. */
+    rotation_control: GUIController;
+
+	/** Enables/disables rotating with object. */
+	rotate_with_object: boolean = true
+
     /** This method adds the video controls.
      * @param pause_play_func {() => void} A function used to pause/play the animation clip.
      * @param set_time_func {() => void} A function used to set the time of the anmiation clip.
@@ -58,7 +64,7 @@ export class MyGui extends GUI {
         this.pause_play_button.name("\u23F8");
 
         // Add looping controls
-        var func = this.set_loop.bind(this); // Binding this to its method so we can pass it as a standalone function
+        var func = this.setLoop.bind(this); // Binding this to its method so we can pass it as a standalone function
         this.loop_button = this.video_controls.add({ loop: func }, "loop");
         this.loop_button.name("\uD83D\uDD03");
         this.looping = true;
@@ -85,7 +91,10 @@ export class MyGui extends GUI {
     addCameraControls(camera: MyCamera) {
         this.camera = camera;
 
+		// Create folder
         this.camera_controls = this.addFolder("Camera controls");
+
+		// Setup drop down list to choose which object to follow
         var follow_obj = {};
         follow_obj["None"] = -1;
         this.camera.followable_objs.forEach(
@@ -97,9 +106,24 @@ export class MyGui extends GUI {
             follow_obj,
         );
         var func = this.setCameraToFollow.bind(this); // Binding this to its method so we can pass it as a standalone function
+		this.follow_control.name("Follow object");
         this.follow_control.onChange(func);
         this.follow_control.setValue(-1);
+
+		// Setup checkbox to enable/disable rotate with object
+		this.rotation_control = this.camera_controls.add( {value: true}, "value");
+		this.rotation_control.name("Rotate with object");
+		this.rotation_control.setValue(true);
+        var func2 = this.test.bind(this); // Binding this to its method so we can pass it as a standalone function
+		this.rotation_control.onChange(func2);
     }
+
+	test(val: boolean)
+	{
+		this.rotate_with_object = val;
+		this.camera.rotation = val;
+		this.setCameraToFollow(this.follow_control.getValue());
+	}
 
     /**
      * Sets the camera to follow the given object.
@@ -108,16 +132,46 @@ export class MyGui extends GUI {
     setCameraToFollow(id: number) {
         if (id < 0) {
             this.camera.follow_obj = null;
+			this.camera.scene.add(this.camera.camera);
         } else {
-            // Need to call Math.trunc on this, otherwise a float gets passed in which leads to an undefined
-            // object.
-            this.camera.follow_obj = this.camera.scene.getObjectById(
-                Math.trunc(id),
-            );
-            this.camera.follow_obj_offset.subVectors(
-                this.camera.camera.position,
-                this.camera.follow_obj.position,
-            );
+			// Need to call Math.trunc on this, otherwise a float gets passed in which leads to an undefined
+			// object.
+			this.camera.follow_obj = this.camera.scene.getObjectById(
+				Math.trunc(id),
+			);
+			if (this.rotate_with_object)
+			{
+				// If rotation is enabled, then just add the camera as a child of the object.
+				// This will keep the camera in the same place relative to the object.
+				var wpc_o = new THREE.Vector3;
+				var wpc_n = new THREE.Vector3;
+				var wpc = new THREE.Vector3;
+				this.camera.scene.updateMatrixWorld();
+				this.camera.camera.getWorldPosition(wpc_o);
+				//this.camera.follow_obj.getWorldPosition(wpo);
+				//console.log("before " + wpc.x + " " +wpc.y + " " +wpc.z);
+
+				this.camera.follow_obj.add(this.camera.camera);
+				this.camera.camera.updateMatrixWorld(true);
+
+				//this.camera.camera.position.equals(this.camera.follow_obj.worldToLocal(wpc));
+				this.camera.scene.updateMatrixWorld();
+				//this.camera.camera.getWorldPosition(wpc_n);
+				//wpc.subVectors(wpc_n, wpc_o);
+				//TODO: Work in progress
+				this.camera.camera.position.copy(this.camera.camera.worldToLocal(wpc_o));
+				//this.camera.camera.position.equals(this.camera.follow_obj.localToWorld(wpc_o));
+				//console.log("after" + wpc.x + " " +wpc.y + " " +wpc.z);
+			}
+			else
+			{
+				this.camera.scene.add(this.camera.camera);
+				var wpc = new THREE.Vector3;
+				var wpo = new THREE.Vector3;
+				this.camera.camera.getWorldPosition(wpc);
+				this.camera.follow_obj.getWorldPosition(wpo);
+				this.camera.follow_obj_offset.subVectors( wpc, wpo);
+			}
         }
     }
 
@@ -148,7 +202,7 @@ export class MyGui extends GUI {
     /**
      * This function changes the loop status (single vs. infinite).
      */
-    set_loop() {
+    setLoop() {
         if (this.looping) {
             // Called when loop is disabled
             this.looping = false;

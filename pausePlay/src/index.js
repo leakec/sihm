@@ -86,10 +86,10 @@ mixer.addKeyframeTrack(
 );
 
 // ROTATION
-var xAxis = new THREE.Vector3(1, 0, 0);
+var yAxis = new THREE.Vector3(0, 1, 0);
 
-var qInitial = new THREE.Quaternion().setFromAxisAngle(xAxis, 0);
-var qFinal = new THREE.Quaternion().setFromAxisAngle(xAxis, Math.PI);
+var qInitial = new THREE.Quaternion().setFromAxisAngle(yAxis, 0);
+var qFinal = new THREE.Quaternion().setFromAxisAngle(yAxis, Math.PI);
 mixer.addKeyframeTrack(
     new THREE.QuaternionKeyframeTrack(
         box_uuid + ".quaternion",
@@ -165,6 +165,43 @@ var render = function () {
     renderer.render(scene, camera_per);
 };
 
+//TESTING
+//scene.traverse( function ( obj ) {
+//
+//	var s = '|___';
+//
+//	var obj2 = obj;
+//
+//	while ( obj2 !== scene ) {
+//
+//		s = '\t' + s;
+//
+//		obj2 = obj2.parent;
+//
+//	}
+//
+//	console.log( s + obj.name + ' <' + obj.type + '>' );
+//
+//} );
+////box.add(camera.camera);
+//scene.traverse( function ( obj ) {
+//
+//	var s = '|___';
+//
+//	var obj2 = obj;
+//
+//	while ( obj2 !== scene ) {
+//
+//		s = '\t' + s;
+//
+//		obj2 = obj2.parent;
+//
+//	}
+//
+//	console.log( s + obj.name + ' <' + obj.type + '>' );
+//
+//} );
+
 // Animation
 function animate() {
     if (!paused) {
@@ -173,6 +210,9 @@ function animate() {
         mixer.update(delta);
         gui.update_time();
         camera.update();
+
+		//TESTING
+		//console.log("box: "+box.quaternion);
 
         // See: https://stemkoski.github.io/Three.js/Chase-Camera.html
         // See: http://stemkoski.github.io/Three.js/

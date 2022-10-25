@@ -16,6 +16,9 @@ export class MyCamera {
     /** Offset from object the camera is following. */
     follow_obj_offset: THREE.Vector3 = new THREE.Vector3();
 
+	/** Boolean that enables/disables rotating with the object */
+	rotation: boolean = true;
+
     /** Determines if an object is being followed. */
 
     /** Class constructor
@@ -44,13 +47,20 @@ export class MyCamera {
     /** This function updates the camera position/orientation.
      */
     update() {
-        if (this.follow_obj != null) {
-            this.camera.position.addVectors(
-                this.follow_obj.position,
-                this.follow_obj_offset,
-            );
-            this.camera.quaternion.equals(this.follow_obj.quaternion);
+		if (this.follow_obj != null){
+			if (!this.rotation)
+			{
+				// Following the object but do not rotate with it. Therefore, camera is not a child
+				// of the object, so we need to update its position manually.
+				var wp = new THREE.Vector3;
+				this.follow_obj.getWorldPosition(wp);
+				this.camera.position.addVectors(
+					wp,
+					this.follow_obj_offset,
+				);
+			}
+            //this.camera.quaternion.equals(this.follow_obj.quaternion);
             this.camera.lookAt(this.follow_obj.position); // Works for follow w/o change in rotation
-        }
-    }
+		}
+	}
 }
