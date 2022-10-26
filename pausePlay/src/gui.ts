@@ -37,32 +37,29 @@ export class MyGui extends GUI {
     /** Controls which object the camera is following. */
     follow_control: GUIController;
 
-	/** Real-time slider control. */
-	real_time_slider: GUIController;
+    /** Real-time slider control. */
+    real_time_slider: GUIController;
 
     /** Controls whether the camera rotates with the object or not. */
     rotation_control: GUIController;
 
-	/** Enables/disables rotating with object. */
-	rotate_with_object: boolean = true
+    /** Enables/disables rotating with object. */
+    rotate_with_object: boolean = true;
 
     /** This method adds the video controls.
      * @param pause_play_func {() => void} A function used to pause/play the animation clip.
      * @param mixer {MyMixer} The mixer that owns the animation clip.
      */
-    addVideoControls(
-        pause_play_func: () => void,
-        mixer: MyMixer,
-    ) {
-		this.mixer = mixer;
-		this.clip_action = mixer.clip_action;
+    addVideoControls(pause_play_func: () => void, mixer: MyMixer) {
+        this.mixer = mixer;
+        this.clip_action = mixer.clip_action;
 
         this.video_controls = this.addFolder("Video controls");
 
         // Add pause/play
         this.pause_play_button = this.video_controls.add(
             { "Pause/Play": pause_play_func },
-            "Pause/Play",
+            "Pause/Play"
         );
         this.pause_play_button.name("\u23F8");
 
@@ -72,12 +69,17 @@ export class MyGui extends GUI {
         this.loop_button.name("\uD83D\uDD03");
         this.looping = true;
 
-		// Add a slider for real-time factor
-		this.real_time_slider = this.video_controls.add({ rt: 1.0 }, "rt", 0.01, 5.0)
+        // Add a slider for real-time factor
+        this.real_time_slider = this.video_controls.add(
+            { rt: 1.0 },
+            "rt",
+            0.01,
+            5.0
+        );
         var func2 = this.updateRealTimeFactor.bind(this); // Binding this to its method so we can pass it as a standalone function
-		this.real_time_slider.onChange(func2);
-		this.real_time_slider.name("Real time factor");
-		this.real_time_slider.setValue(1.0);
+        this.real_time_slider.onChange(func2);
+        this.real_time_slider.name("Real time factor");
+        this.real_time_slider.setValue(1.0);
 
         // Add slider for time
         this.max_time = this.clip_action.getClip().duration;
@@ -85,7 +87,7 @@ export class MyGui extends GUI {
             { Time: 0.0 },
             "Time",
             0.0,
-            this.max_time,
+            this.max_time
         );
         this.time_slider.onChange(this.setTime.bind(this));
         this.video_controls.open();
@@ -94,39 +96,41 @@ export class MyGui extends GUI {
     addCameraControls(camera: MyCamera) {
         this.camera = camera;
 
-		// Create folder
+        // Create folder
         this.camera_controls = this.addFolder("Camera controls");
 
-		// Setup drop down list to choose which object to follow
+        // Setup drop down list to choose which object to follow
         var follow_obj = {};
         follow_obj["None"] = -1;
         this.camera.followable_objs.forEach(
-            (obj) => (follow_obj[obj.name] = obj.id),
+            (obj) => (follow_obj[obj.name] = obj.id)
         );
         this.follow_control = this.camera_controls.add(
             { name: "Follow object" },
             "name",
-            follow_obj,
+            follow_obj
         );
         var func = this.setCameraToFollow.bind(this); // Binding this to its method so we can pass it as a standalone function
-		this.follow_control.name("Follow object");
+        this.follow_control.name("Follow object");
         this.follow_control.onChange(func);
         this.follow_control.setValue(-1);
 
-		// Setup checkbox to enable/disable rotate with object
-		this.rotation_control = this.camera_controls.add( {value: true}, "value");
-		this.rotation_control.name("Rotate with object");
-		this.rotation_control.setValue(true);
+        // Setup checkbox to enable/disable rotate with object
+        this.rotation_control = this.camera_controls.add(
+            { value: true },
+            "value"
+        );
+        this.rotation_control.name("Rotate with object");
+        this.rotation_control.setValue(true);
         var func2 = this.test.bind(this); // Binding this to its method so we can pass it as a standalone function
-		this.rotation_control.onChange(func2);
+        this.rotation_control.onChange(func2);
     }
 
-	test(val: boolean)
-	{
-		this.rotate_with_object = val;
-		this.camera.rotation = val;
-		this.setCameraToFollow(this.follow_control.getValue());
-	}
+    test(val: boolean) {
+        this.rotate_with_object = val;
+        this.camera.rotation = val;
+        this.setCameraToFollow(this.follow_control.getValue());
+    }
 
     /**
      * Sets the camera to follow the given object.
@@ -135,36 +139,33 @@ export class MyGui extends GUI {
     setCameraToFollow(id: number) {
         if (id < 0) {
             this.camera.follow_obj = null;
-			this.camera.scene.add(this.camera.camera);
+            this.camera.scene.add(this.camera.camera);
         } else {
-			// Need to call Math.trunc on this, otherwise a float gets passed in which leads to an undefined
-			// object.
-			this.camera.follow_obj = this.camera.scene.getObjectById(
-				Math.trunc(id),
-			);
-			if (this.rotate_with_object)
-			{
-				this.camera.follow_obj.attach(this.camera.camera);
-			}
-			else
-			{
-				this.camera.scene.attach(this.camera.camera);
-				var wpc = new THREE.Vector3;
-				var wpo = new THREE.Vector3;
-				this.camera.camera.getWorldPosition(wpc);
-				this.camera.follow_obj.getWorldPosition(wpo);
-				this.camera.follow_obj_offset.subVectors( wpc, wpo);
-			}
+            // Need to call Math.trunc on this, otherwise a float gets passed in which leads to an undefined
+            // object.
+            this.camera.follow_obj = this.camera.scene.getObjectById(
+                Math.trunc(id)
+            );
+            if (this.rotate_with_object) {
+                this.camera.follow_obj.attach(this.camera.camera);
+            } else {
+                this.camera.scene.attach(this.camera.camera);
+                var wpc = new THREE.Vector3();
+                var wpo = new THREE.Vector3();
+                this.camera.camera.getWorldPosition(wpc);
+                this.camera.follow_obj.getWorldPosition(wpo);
+                this.camera.follow_obj_offset.subVectors(wpc, wpo);
+            }
         }
     }
 
-	/** 
-	 * This method changes the real-time factor of the animation mixer.
-	 * @param real_time_factor {number} Real-time factor.
-	 */
-	updateRealTimeFactor(real_time_factor: number) {
-		this.clip_action.setEffectiveTimeScale(real_time_factor);
-	}
+    /**
+     * This method changes the real-time factor of the animation mixer.
+     * @param real_time_factor {number} Real-time factor.
+     */
+    updateRealTimeFactor(real_time_factor: number) {
+        this.clip_action.setEffectiveTimeScale(real_time_factor);
+    }
 
     /**
      * This is called when the animation is paused.
@@ -215,13 +216,13 @@ export class MyGui extends GUI {
         this.updateControllerWithoutCB(this.time_slider, this.clip_action.time);
     }
 
-	/**
-	 * Set the mixer's time.
-	 * @param value{number} Time to set the mixer to.
-	 */
-	setTime(value: number) {
-		this.mixer.setTime(value / this.clip_action.getEffectiveTimeScale())
-	}
+    /**
+     * Set the mixer's time.
+     * @param value{number} Time to set the mixer to.
+     */
+    setTime(value: number) {
+        this.mixer.setTime(value / this.clip_action.getEffectiveTimeScale());
+    }
 
     /**
      * This method updates a controllers value without triggering its onChange function.
