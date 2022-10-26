@@ -110,7 +110,7 @@ with open("test.js", "w") as f:
 
         # Object
         f.write(f"var {name} = new THREE.Mesh({name}_geometry, {name}_material);\n")
-        f.write(f"{name}.name = \"{name}\"\n");
+        f.write(f'{name}.name = "{name}"\n')
         f.write(f"scene.add({name});\n")
         f.write(f"var {name}_uuid = {name}.uuid;\n\n")
 
