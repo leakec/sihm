@@ -1,5 +1,6 @@
 import { GUI, GUIController } from "dat.gui";
 import { MyCamera } from "./camera";
+import { MyMixer } from "./animator";
 import * as THREE from "three";
 
 export class MyGui extends GUI {
@@ -17,6 +18,9 @@ export class MyGui extends GUI {
 
     /** This is the clip action that is being controlled by the video controls. */
     clip_action: THREE.AnimationAction;
+
+    /** This is the mixer that owns the clip action. */
+    mixer: MyMixer;
 
     /** Indicates wether the video is looping or not. */
     looping: boolean;
@@ -44,17 +48,16 @@ export class MyGui extends GUI {
 
     /** This method adds the video controls.
      * @param pause_play_func {() => void} A function used to pause/play the animation clip.
-     * @param set_time_func {() => void} A function used to set the time of the anmiation clip.
-     * @param clip_action {THREE.AnimationAction} The clip action that the video controls will control.
+     * @param mixer {MyMixer} The mixer that owns the animation clip.
      */
     addVideoControls(
         pause_play_func: () => void,
-        set_time_func: () => void,
-        clip_action: THREE.AnimationAction,
+        mixer: MyMixer,
     ) {
-        this.video_controls = this.addFolder("Video controls");
+		this.mixer = mixer;
+		this.clip_action = mixer.clip_action;
 
-        this.clip_action = clip_action;
+        this.video_controls = this.addFolder("Video controls");
 
         // Add pause/play
         this.pause_play_button = this.video_controls.add(
@@ -84,7 +87,7 @@ export class MyGui extends GUI {
             0.0,
             this.max_time,
         );
-        this.time_slider.onChange(set_time_func);
+        this.time_slider.onChange(this.setTime.bind(this));
         this.video_controls.open();
     }
 
@@ -141,31 +144,11 @@ export class MyGui extends GUI {
 			);
 			if (this.rotate_with_object)
 			{
-				// If rotation is enabled, then just add the camera as a child of the object.
-				// This will keep the camera in the same place relative to the object.
-				var wpc_o = new THREE.Vector3;
-				var wpc_n = new THREE.Vector3;
-				var wpc = new THREE.Vector3;
-				this.camera.scene.updateMatrixWorld();
-				this.camera.camera.getWorldPosition(wpc_o);
-				//this.camera.follow_obj.getWorldPosition(wpo);
-				//console.log("before " + wpc.x + " " +wpc.y + " " +wpc.z);
-
-				this.camera.follow_obj.add(this.camera.camera);
-				this.camera.camera.updateMatrixWorld(true);
-
-				//this.camera.camera.position.equals(this.camera.follow_obj.worldToLocal(wpc));
-				this.camera.scene.updateMatrixWorld();
-				//this.camera.camera.getWorldPosition(wpc_n);
-				//wpc.subVectors(wpc_n, wpc_o);
-				//TODO: Work in progress
-				this.camera.camera.position.copy(this.camera.camera.worldToLocal(wpc_o));
-				//this.camera.camera.position.equals(this.camera.follow_obj.localToWorld(wpc_o));
-				//console.log("after" + wpc.x + " " +wpc.y + " " +wpc.z);
+				this.camera.follow_obj.attach(this.camera.camera);
 			}
 			else
 			{
-				this.camera.scene.add(this.camera.camera);
+				this.camera.scene.attach(this.camera.camera);
 				var wpc = new THREE.Vector3;
 				var wpo = new THREE.Vector3;
 				this.camera.camera.getWorldPosition(wpc);
@@ -228,9 +211,17 @@ export class MyGui extends GUI {
     /**
      * This method updates the time slider with the video animations current time.
      */
-    update_time() {
+    updateTime() {
         this.updateControllerWithoutCB(this.time_slider, this.clip_action.time);
     }
+
+	/**
+	 * Set the mixer's time.
+	 * @param value{number} Time to set the mixer to.
+	 */
+	setTime(value: number) {
+		this.mixer.setTime(value / this.clip_action.getEffectiveTimeScale())
+	}
 
     /**
      * This method updates a controllers value without triggering its onChange function.

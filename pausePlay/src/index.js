@@ -146,13 +146,10 @@ function pause_play() {
         gui.pause();
     }
 }
-function set_time(value) {
-    mixer.setTime(value);
-}
 
 // Create GUI
 const gui = new MyGui();
-gui.addVideoControls(pause_play, set_time, mixer.clip_action);
+gui.addVideoControls(pause_play, mixer);
 gui.addCameraControls(camera);
 
 const clock = new THREE.Clock();
@@ -165,57 +162,14 @@ var render = function () {
     renderer.render(scene, camera_per);
 };
 
-//TESTING
-//scene.traverse( function ( obj ) {
-//
-//	var s = '|___';
-//
-//	var obj2 = obj;
-//
-//	while ( obj2 !== scene ) {
-//
-//		s = '\t' + s;
-//
-//		obj2 = obj2.parent;
-//
-//	}
-//
-//	console.log( s + obj.name + ' <' + obj.type + '>' );
-//
-//} );
-////box.add(camera.camera);
-//scene.traverse( function ( obj ) {
-//
-//	var s = '|___';
-//
-//	var obj2 = obj;
-//
-//	while ( obj2 !== scene ) {
-//
-//		s = '\t' + s;
-//
-//		obj2 = obj2.parent;
-//
-//	}
-//
-//	console.log( s + obj.name + ' <' + obj.type + '>' );
-//
-//} );
-
 // Animation
 function animate() {
     if (!paused) {
         // Update animation
         var delta = clock.getDelta();
         mixer.update(delta);
-        gui.update_time();
+        gui.updateTime();
         camera.update();
-
-		//TESTING
-		//console.log("box: "+box.quaternion);
-
-        // See: https://stemkoski.github.io/Three.js/Chase-Camera.html
-        // See: http://stemkoski.github.io/Three.js/
     }
 }
 
