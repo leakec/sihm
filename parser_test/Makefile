@@ -12,7 +12,7 @@ package.json :
 	yarn add three webpack webpack-cli dat.gui @types/three @types/dat.gui typescript
 
 src/index.js :
-	cd parser; python parser.py; mv test.js ../src/index.js
+	cd parser; python test_parser.py; mv index.js ../src/index.js
 
 dist/main.js: src/index.js $(SRC_JS_FILES) $(SRC_TS_FILES) package.json
 	yarn webpack
