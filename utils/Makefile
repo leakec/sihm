@@ -3,5 +3,8 @@ install:
 create_completions:
 	cd ../bin; _SIHM_COMPLETE=bash_source sihm > ./_sihm_complete_bash; _SIHM_COMPLETE=zsh_source sihm > ./_sihm_complete_zsh
 
-rpm :
-	cd ../packaging/rpmbuild/SOURCES; cp ../../../bin/_sihm* .; tar -czvf _sihm_complete_zsh.tar.gz _sihm_complete_zsh; tar -czvf _sihm_complete_bash.tar.gz _sihm_complete_bash; rm _sihm_complete_zsh _sihm_complete_bash
+rpm-package :
+	cd ../packaging/rpmbuild/SOURCES; mkdir -p sihm-0.0.1; cd sihm-0.0.1; cp ../../../../bin/_sihm* .; cd ..; tar -czvf sihm-0.0.1.tar.gz sihm-0.0.1; rm -rf sihm-0.0.1
+
+rpm : rpm-package
+	cd ../packaging/rpmbuild; rpmbuild --define "_topdir `pwd`" -ba SPECS/sihm.spec
