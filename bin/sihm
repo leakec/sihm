@@ -1,0 +1,124 @@
+#!/usr/bin/python
+
+import click
+from typing import Any, Dict
+from copy import deepcopy
+
+options = {}
+output_type = ""
+file_name = ""
+
+
+def _get_default(cli) -> Dict[Any, Any]:
+    """
+    Gets default values from click.
+    """
+    default_dict = {}
+    for cmd_name, cmd in cli.commands.items():
+        default_dict[cmd_name] = {}
+        for opt in cmd.params:
+            default_dict[cmd_name][opt.name] = opt.default
+
+    return default_dict
+
+
+def _merge_dict(d1: Dict[Any, Any], d2: Dict[Any, Any], copy: bool = True) -> Dict[Any, Any]:
+    """
+    Override the values in d1 with d2.
+    """
+    if copy:
+        d3 = deepcopy(d1)
+    else:
+        d3 = d1
+    for k, v in d2:
+        if k in d3:
+            if isinstance(v, dict):
+                d3[k] = _merge_dict(d3[k], d1[k], copy=False)
+            else:
+                d3[k] = v
+        else:
+            d3[k] = v
+    return d3
+
+
+def _add_options(cmd, opts):
+    """
+    Adds options to global options.
+    """
+    options[cmd] = opts
+
+
+def input_cb(ctx, opt, val) -> None:
+    """
+    Sets the input filename.
+    """
+    global file_name
+    file_name = val
+
+
+def param_cb(ctx, opt, val):
+    """
+    Changes the parameter options.
+    """
+    global output_type
+    output_type = val
+    if val == "project":
+
+        @cli.command
+        @click.pass_context
+        @click.option(
+            "--dir",
+            type=click.Path(exists=True, dir_okay=True, file_okay=False),
+            default=".",
+            show_default=True,
+        )
+        def params(ctx, **kwargs):
+            _add_options("params", kwargs)
+
+    else:
+
+        @cli.command
+        @click.pass_context
+        @click.option("--test-name")
+        def params(ctx, **kwargs):
+            _add_options("params", kwargs)
+
+
+@click.group(
+    name="sihm",
+    invoke_without_command=True,
+    chain=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
+)
+@click.option(
+    "--input",
+    "-i",
+    type=click.Path(exists=True, dir_okay=False, file_okay=True),
+    help="Input configuration file.",
+    required=True,
+    callback=input_cb,
+)
+@click.option(
+    "--output",
+    type=click.Choice(["project", "html"]),
+    help="sihm output type:\n\n project - Creates the yarn project used to compile the standalone HTML.\n\n html - Creates the standalone HTML file. The associated yarn project is created in a temporary directory.",
+    default="html",
+    show_default=True,
+    callback=param_cb,
+    is_eager=True,
+)
+@click.pass_context
+def cli(ctx, **kwargs):
+    pass
+
+
+run = cli(standalone_mode=False)
+if isinstance(run, int):
+    import sys
+
+    sys.exit(run)
+else:
+    default_opts = _get_default(cli)
+    options = _merge_dict(default_opts, options)
+
+print(options)
