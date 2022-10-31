@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
+import os
 import click
 from typing import Any, Dict
 from copy import deepcopy
+from pathlib import Path
 
 options = {}
 output_type = ""
@@ -120,5 +122,25 @@ if isinstance(run, int):
 else:
     default_opts = _get_default(cli)
     options = _merge_dict(default_opts, options)
+
+
+def _make_project(directory: Path) -> None:
+    """
+    Create project that is ready to compile.
+    """
+    import shutil
+    import sihm
+
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    sihm_path = Path(sihm.__file__)
+    template_project = os.path.join(sihm_path.parents[0], "template_project")
+    shutil.copytree(template_project, directory.absolute(), dirs_exist_ok=True)
+
+
+if output_type == "project":
+    # If user wants the standalone project only
+    project_dir = Path(options["params"]["dir"])
+    _make_project(project_dir)
 
 print(options)

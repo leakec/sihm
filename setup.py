@@ -3,6 +3,7 @@ from os import path
 import numpy
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_py import build_py as _build_py
+from glob import glob
 
 # Get long description
 this_directory = path.abspath(path.dirname(__file__))
