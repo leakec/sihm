@@ -1,4 +1,5 @@
-VERSION=0.0.1
+# Get version from the version.py file
+VERSION=$(shell cd ../src/sihm; python -c "from version import __version__; print(__version__)")
 
 install: 
 	cd ..; python setup.py bdist_wheel; pip install dist/*.whl --force
@@ -13,10 +14,16 @@ rpm-package :
 rpm : rpm-package
 	cd ../packaging/rpmbuild; rpmbuild --define "_topdir `pwd`" -ba SPECS/sihm.spec
 
+clean-rpm: 
+	rm -rf ../packaging/rpmbuild/BUILD 
+	rm -rf ../packaging/rpmbuild/RPMS 
+	rm -rf ../packaging/rpmbuild/SRPMS
+
 template_project:
 	mkdir -p ../TEMPDIR
 	cp ../src/*.ts ../TEMPDIR
 	(cd ../TEMPDIR; yarn init -p -y; yarn add three webpack webpack-cli dat.gui @types/three @types/dat.gui typescript; yarn tsc -t es6 *.ts);
 	cp ../TEMPDIR/*.js ../src/sihm/template_project/src/
 	rm -rf ../TEMPDIR
+
 
