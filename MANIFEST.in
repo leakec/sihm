@@ -1,1 +1,2 @@
 include src/sihm/template_project/**/*
+include src/sihm/template_project/Makefile
