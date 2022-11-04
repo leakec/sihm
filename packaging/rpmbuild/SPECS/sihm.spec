@@ -5,7 +5,7 @@ Summary: Standalone Interactive HMTL Movie (SIHM) maker
 
 License:        MIT
 URL:           https://github.com/leakec/sihm
-Source0:        sihm-0.0.1.tar.gz
+Source0:        sihm-%{version}.tar.gz
 
 #BuildRequires:  
 #Requires:       
