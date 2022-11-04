@@ -8,7 +8,7 @@ from pathlib import Path
 
 options = {}
 output_type = ""
-file_name = ""
+cfg_file = ""
 
 
 def _get_default(cli) -> Dict[Any, Any]:
@@ -32,10 +32,10 @@ def _merge_dict(d1: Dict[Any, Any], d2: Dict[Any, Any], copy: bool = True) -> Di
         d3 = deepcopy(d1)
     else:
         d3 = d1
-    for k, v in d2:
+    for k, v in d2.items():
         if k in d3:
             if isinstance(v, dict):
-                d3[k] = _merge_dict(d3[k], d1[k], copy=False)
+                d3[k] = _merge_dict(d3[k], d2[k], copy=False)
             else:
                 d3[k] = v
         else:
@@ -54,8 +54,8 @@ def input_cb(ctx, opt, val) -> None:
     """
     Sets the input filename.
     """
-    global file_name
-    file_name = val
+    global cfg_file
+    cfg_file = val
 
 
 def param_cb(ctx, opt, val):
@@ -81,7 +81,14 @@ def param_cb(ctx, opt, val):
 
         @cli.command
         @click.pass_context
-        @click.option("--test-name")
+        @click.option(
+            "--jobs",
+            "-j",
+            type=click.IntRange(min=1),
+            default=1,
+            show_default=True,
+            help="Number of cores to use when building the project",
+        )
         def params(ctx, **kwargs):
             _add_options("params", kwargs)
 
@@ -124,23 +131,71 @@ else:
     options = _merge_dict(default_opts, options)
 
 
+def _parse_file(cfg_file: Path, file_name: str):
+    """
+    Parse the file to create index.js
+
+    Parameters
+    ----------
+    cfg_file : Path
+        Input config file.
+    fileName : str
+        Output file name.
+    """
+    from sihm.parser import SihmParser
+
+    parser = SihmParser(cfg_file, file_name)
+    parser.write_file()
+
+
 def _make_project(directory: Path) -> None:
     """
     Create project that is ready to compile.
+
+    directory: Path
+        Directory where the project should be created.
     """
-    import shutil
+    from shutil import copytree
     import sihm
 
     if not os.path.exists(directory):
         os.makedirs(directory)
     sihm_path = Path(sihm.__file__)
     template_project = os.path.join(sihm_path.parents[0], "template_project")
-    shutil.copytree(template_project, directory.absolute(), dirs_exist_ok=True)
+    copytree(template_project, directory.absolute(), dirs_exist_ok=True)
+
+    # Create path/file for index.js
+    file_name = os.path.join(directory.absolute(), "src", "index.js")
+
+    # Parse the cfg_file and create the index.js file
+    _parse_file(Path(cfg_file), file_name)
 
 
 if output_type == "project":
     # If user wants the standalone project only
     project_dir = Path(options["params"]["dir"])
     _make_project(project_dir)
+else:
+    import tempfile
+    from shutil import copyfile
 
-print(options)
+    # Get the name/location of the final HTML file
+    dark = Path(cfg_file)
+    html_file = dark.with_suffix(".html").resolve()
+
+    # Create temporary directory for the project
+    temp_dir = tempfile.TemporaryDirectory()
+
+    # Create project
+    project_dir = Path(temp_dir.name)
+    _make_project(project_dir)
+
+    # Compile the project
+    curr_dir = os.getcwd()
+    os.chdir(project_dir)
+    os.system(f"make all -j {options['params']['jobs']}")
+
+    # Copy the file to its final location
+    file_to_copy = Path(os.path.join("dist", "index.html"))
+    copyfile(file_to_copy.resolve(), html_file)
+    os.chdir(curr_dir)
