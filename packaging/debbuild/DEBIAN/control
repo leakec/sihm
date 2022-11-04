@@ -1,0 +1,6 @@
+Package: sihm
+Version: 0.0.1
+Architecture: all
+Maintainer: Carl Leake <leakec57@gmail.com>
+Description: Standalone interactive HTML movie.
+Depends: nodejs (>= 16), yarn, make
