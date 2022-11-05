@@ -107,8 +107,8 @@ render();
             Output file name.
         """
         self._readData(cfg_file)
-        self._file = open(fileName, "w")
-        self._extra_beginning_boilerplate: Set[str] = {}
+        self._file = open(fileName, "w+")
+        self._extra_beginning_boilerplate: Set[str] = set()
 
     def __del__(self) -> None:
         self._file.close()
@@ -139,6 +139,26 @@ render();
 
             with open(cfg_file, "r") as f:
                 self._data = yaml.load(f, Loader=yaml.FullLoader)
+
+    def _append_to_file(self, pos: int, text: str) -> None:
+        """
+        Append text to position in self._file.
+
+        Parameters
+        ----------
+        pos : int
+            Position in file.
+        text : str
+            Text to append.
+        """
+
+        curr_pos = self._file.tell()
+        self._file.seek(pos)
+        old_text = self._file.readlines()
+        self._file.seek(pos)
+        self._file.write(text)
+        self._file.writelines(old_text)
+        self._file.seek(curr_pos)
 
     def _createObject(self, name: str, obj: Dict[Any, Any], parent="scene") -> None:
         """
@@ -177,9 +197,13 @@ render();
                 )
             elif geo.get("FILE", None):
                 # Object
+                self._extra_beginning_boilerplate.add(
+                    "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
+                )
+                self._extra_beginning_boilerplate.add("import {readFileSync} from fs;\n")
                 self._extra_beginning_boilerplate.add("const OBJ_LOADER = new OBJLoader();\n")
                 self._file.write(
-                    f"var {name} = new THREE.Mesh({name}_geometry, {name}_material);\n"
+                    f"var {name} = OBJ_LOADER.parse(readFileSync(\"{geo['FILE']}\"));\n"
                 )
 
             # Add object to parent and get uuid
@@ -210,16 +234,23 @@ render();
         """
         Write the JavaScript ThreeJS file.
         """
+        from io import SEEK_END
 
         # Write beginning boilerplate
         self._file.write(self._imports)
-        for line in self._extra_beginning_boilerplate:
-            self._file.write(line)
+        loc = self._file.tell()
         self._file.write(self._beginning_boilerplate)
 
         # Create objects and animations
         for name, obj in self._data["OBJECTS"].items():
             self._createObject(name, obj, parent="scene")
+
+        # Add in extra beginning boilerplate.
+        # this must be done after calling _createObject, since
+        # that is the function that adds this boilerplate.
+        lines = "".join(self._extra_beginning_boilerplate)
+        self._append_to_file(loc, lines)
+        self._file.seek(0, SEEK_END)
 
         # Write ending boilerplate
         self._file.write(self._ending_boilerplate)
