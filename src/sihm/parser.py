@@ -1,3 +1,4 @@
+import os
 from typing import Dict, Any, IO, Set
 from pathlib import Path
 
@@ -108,7 +109,11 @@ render();
         """
         self._readData(cfg_file)
         self._file = open(fileName, "w+")
+        self._path = Path(fileName.replace("index.js", ""))
+        self._extra_imports: Set[str] = set()
         self._extra_beginning_boilerplate: Set[str] = set()
+        self._file_dict = {}
+        self._extra_file_count = 0
 
     def __del__(self) -> None:
         self._file.close()
@@ -160,6 +165,35 @@ render();
         self._file.writelines(old_text)
         self._file.seek(curr_pos)
 
+    def _addExtraFile(self, file: str) -> str:
+        if file not in self._file_dict:
+            name = f"SIHM_EXTRA_FILE_{self._extra_file_count}"
+            name_js = f"{name}.js"
+            new_file = os.path.join(self._path, name_js)
+            self._file_dict[file] = name
+            with open(file, "r") as f:
+                text = f.read()
+            with open(new_file, "w") as f:
+                f.write(f"export const {name} = `\n")
+                f.write(text)
+                f.write("\n`;")
+
+            self._extra_file_count += 1
+
+            return name
+        else:
+            return self._file_dict[file]
+
+    def _createLight(self, name: str, light: Dict[Any, Any], parent="scene") -> None:
+        if light.get("FUNCTION", None):
+            light_args = ",".join([str(x) for x in light["ARGS"]])
+            self._file.write(f"var {name}_light = new THREE.{light['FUNCTION']}({light_args});\n")
+            self._file.write(f"{parent}.add({name}_light);\n")
+
+            if light.get("POSITION", None):
+                pos = ", ".join([str(x) for x in light["POSITION"]])
+                self._file.write(f"{name}_light.position.set({pos});\n")
+
     def _createObject(self, name: str, obj: Dict[Any, Any], parent="scene") -> None:
         """
         Creates object and children.
@@ -196,15 +230,36 @@ render();
                     f"var {name} = new THREE.Mesh({name}_geometry, {name}_material);\n"
                 )
             elif geo.get("FILE", None):
+                # Material
+                if obj.get("MATERIAL", None):
+                    if obj["MATERIAL"].get("FILE", None):
+                        js_name = self._addExtraFile(obj["MATERIAL"]["FILE"])
+                        self._extra_imports.add(
+                            "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
+                        )
+                        self._extra_imports.add(
+                            "import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';\n"
+                        )
+                        self._extra_imports.add(
+                            "import { " + js_name + " } from './" + js_name + "';\n"
+                        )
+                        self._extra_beginning_boilerplate.add(
+                            "const OBJ_LOADER = new OBJLoader();\n"
+                        )
+                        self._extra_beginning_boilerplate.add(
+                            "const MTL_LOADER = new MTLLoader();\n"
+                        )
+                        self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
+
                 # Object
-                self._extra_beginning_boilerplate.add(
+                js_name = self._addExtraFile(geo["FILE"])
+                self._extra_imports.add(
                     "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
                 )
-                self._extra_beginning_boilerplate.add("import {readFileSync} from fs;\n")
+                self._extra_imports.add("import { " + js_name + " } from './" + js_name + "';\n")
                 self._extra_beginning_boilerplate.add("const OBJ_LOADER = new OBJLoader();\n")
-                self._file.write(
-                    f"var {name} = OBJ_LOADER.parse(readFileSync(\"{geo['FILE']}\"));\n"
-                )
+
+                self._file.write(f"var {name} = OBJ_LOADER.parse({js_name});\n")
 
             # Add object to parent and get uuid
             self._file.write(f'{name}.name = "{name}"\n')
@@ -245,10 +300,14 @@ render();
         for name, obj in self._data["OBJECTS"].items():
             self._createObject(name, obj, parent="scene")
 
+        # Create lights
+        for name, light in self._data["LIGHTS"].items():
+            self._createLight(name, light, parent="scene")
+
         # Add in extra beginning boilerplate.
         # this must be done after calling _createObject, since
         # that is the function that adds this boilerplate.
-        lines = "".join(self._extra_beginning_boilerplate)
+        lines = "".join(self._extra_imports) + "".join(self._extra_beginning_boilerplate)
         self._append_to_file(loc, lines)
         self._file.seek(0, SEEK_END)
 
