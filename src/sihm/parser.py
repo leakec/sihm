@@ -165,14 +165,75 @@ render();
         self._file.writelines(old_text)
         self._file.seek(curr_pos)
 
+    def _readMtlFile(self, file: str) -> str:
+        import base64
+
+        """
+        Reads the data of an MTL file, and embeds any images as base64.
+
+        Parameters
+        ----------
+        file : str
+            Name of the file to read.
+
+        Returns
+        -------
+        str
+            Text of the MTL file, with any images embedded as base64.
+        """
+        base = Path(file).parents[0]
+        with open(file, "r") as f:
+            text = f.readlines()
+        for k, line in enumerate(text):
+            if "map_" in line:
+                pieces = line.split(" ")
+                img_file = Path(os.path.join(base, pieces[1]))
+                suffix = img_file.suffix[1:]
+                with open(img_file, "rb") as f:
+                    encoded_string = base64.b64encode(f.read())
+                text[k] = (
+                    pieces[0]
+                    + " "
+                    + "data:image/"
+                    + suffix
+                    + ";base64,"
+                    + encoded_string.decode("utf-8")
+                )
+
+        return "".join(text)
+
     def _addExtraFile(self, file: str) -> str:
+        """
+        Adds file to _file_dict if it does not exist. This entails
+        creating a SIHM_EXTRA_FILE_*.js file that contains a single string
+        SIHM_EXTRA_FILE* that contains the text of the file. This allows us
+        to webpack everything in that file later on without any external
+        resources. If an entry for this file already exits in _file_dict,
+        then we just return that entry.
+
+        Parameters
+        ----------
+        file : str
+            Name of the file to add.
+
+        Returns
+        -------
+        str
+            Name of the SIHM_EXTRA_FILE_* variable name.
+        """
+
         if file not in self._file_dict:
             name = f"SIHM_EXTRA_FILE_{self._extra_file_count}"
             name_js = f"{name}.js"
             new_file = os.path.join(self._path, name_js)
             self._file_dict[file] = name
-            with open(file, "r") as f:
-                text = f.read()
+            if Path(file).suffix[1:] == "mtl":
+                # Handle material files seperately, as we may need to
+                # embed images into them.
+                text = self._readMtlFile(file)
+            else:
+                with open(file, "r") as f:
+                    text = f.read()
             with open(new_file, "w") as f:
                 f.write(f"export const {name} = `\n")
                 f.write(text)
@@ -183,6 +244,9 @@ render();
             return name
         else:
             return self._file_dict[file]
+
+    def _writeMaterialFile(self):
+        pass
 
     def _createLight(self, name: str, light: Dict[Any, Any], parent="scene") -> None:
         if light.get("FUNCTION", None):
@@ -233,7 +297,7 @@ render();
                 # Material
                 if obj.get("MATERIAL", None):
                     if obj["MATERIAL"].get("FILE", None):
-                        js_name = self._addExtraFile(obj["MATERIAL"]["FILE"])
+                        js_name = self._addExtraFile(Path(obj["MATERIAL"]["FILE"]).resolve())
                         self._extra_imports.add(
                             "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
                         )
@@ -252,7 +316,7 @@ render();
                         self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
 
                 # Object
-                js_name = self._addExtraFile(geo["FILE"])
+                js_name = self._addExtraFile(Path(geo["FILE"]).resolve())
                 self._extra_imports.add(
                     "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
                 )
