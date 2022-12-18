@@ -1,0 +1,23 @@
+<robot name="simple_ramp">
+  <link name="ramp">
+    <inertial>
+      <mass value="1.0" />
+      <!-- center of mass (com) is defined w.r.t. link local coordinate system -->
+      <!-- give a little y-offset to make the top precess -->
+      <origin xyz="0 0 0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <mesh filename="Ramp.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+	<collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <mesh filename="Ramp.obj" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>
