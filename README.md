@@ -2,6 +2,8 @@
 
 **This repository is under construction. Please check back soon :)**
 
+For now, a quick example of sihm's output can be found [here](https://leakec.github.io/sihm/ball_rolling.html).
+
 ## Summary
 
 Create a command-line tool that takes a YAML file (will support other types in the future) that defines geometry and properties of that geometry&mdash;position, velocity, color, etc.&mdash;vs. time and turns it into a standalone, interactive HTML movie.
