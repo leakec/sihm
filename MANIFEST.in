@@ -1,2 +1,2 @@
 include src/sihm/template_project/**/*
-include src/sihm/template_project/Makefile
+include src/sihm/template_project/CMakeLists.txt

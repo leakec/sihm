@@ -193,6 +193,7 @@ else:
     # Compile the project
     curr_dir = os.getcwd()
     os.chdir(project_dir)
+    os.system("cmake .")
     os.system(f"make all -j {options['params']['jobs']}")
 
     # Copy the file to its final location
