@@ -339,9 +339,14 @@ render();
                 self._file.write(f"// {name} animations\n")
                 for track, args in anim.items():
                     dark = ",".join([str(x) for x in args])
-                    self._file.write(
-                        f"mixer.addKeyframeTrack(new THREE.VectorKeyframeTrack({name}_uuid + '.{track}', {dark}));\n"
-                    )
+                    if track == "quaternion":
+                        self._file.write(
+                            f"mixer.addKeyframeTrack(new THREE.QuaternionKeyframeTrack({name}_uuid + '.{track}', {dark}));\n"
+                        )
+                    else:
+                        self._file.write(
+                            f"mixer.addKeyframeTrack(new THREE.VectorKeyframeTrack({name}_uuid + '.{track}', {dark}));\n"
+                        )
                 self._file.write("\n")
 
         # Add children
