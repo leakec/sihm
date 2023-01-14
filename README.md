@@ -2,7 +2,7 @@
 
 **This repository is under construction. Please check back soon :)**
 
-For now, a quick example of sihm's output can be found [here](https://leakec.github.io/sihm/ball_rolling.html).
+For now, a quick example of sihm's output can be found [here](https://leakec.github.io/sihm).
 
 ## Summary
 
