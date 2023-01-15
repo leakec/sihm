@@ -21,7 +21,8 @@ Examples of `sihm`'s output can be found [here](https://leakec.github.io/sihm).
 
 ### Linux
 
--   Install either the `rpm` or `deb` package, depending on you OS.
+-   `pip install sihm`
+-   Install the appropriate package&mdash;`rpm` or `deb`, depending on you OS&mdash; from the latest release.
 
 ### Mac / Windows
 
