@@ -12,7 +12,7 @@ jobs:
             - uses: actions/setup-python@v3
 
             - name: Checkout dependencies
-              run: python -m pip install wheel setuptools
+              run: python -m pip install wheel setuptools numpy
 
             - name: Create binary distribution
               run: python setup.py bdist_wheel
