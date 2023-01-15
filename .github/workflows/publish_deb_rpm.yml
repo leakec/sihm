@@ -1,0 +1,27 @@
+name: Publish DEB, RPM, and binary wheel
+
+on:
+    release:
+        types: [published]
+
+    workflow_dispatch:
+
+jobs:
+    publish_files:
+        name: Publish files
+        runs-on: ubuntu-latest
+        steps:
+            - name: Install libraries
+              run: "sudo apt-get update && sudo apt-get install -y make cmake dpkg rpm"
+
+            - uses: actions/checkout@v3
+            - uses: actions/setup-python@v3
+
+            - name: Build all packages
+              run: "(cd utils; make dist -j 5)"
+
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              if: startsWith(github.ref, 'refs/tags/')
+              with:
+                  files: ./dist/sihm*
