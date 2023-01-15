@@ -2,6 +2,8 @@
 
 **A highly-portable, interactive way to visualize your simulations.**
 
+![PyPI version](https://img.shields.io/pypi/v/sihm)
+
 [**Summary**](#summary) | [**Examples**](https://leakec.github.io/sihm) | [**Installation guide**](#installation)
 
 ## Summary
