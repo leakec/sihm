@@ -18,13 +18,13 @@ jobs:
               run: python setup.py bdist_wheel
 
             - name: Install wheel
-              run: pip install ./dist/sihm*.tar.gz
+              run: pip install ./dist/sihm*.whl
 
             - name: Upload distribution
               uses: actions/upload-artifact@v3
               with:
                   name: wheel
-                  path: ./dist/sihm*.tar.gz
+                  path: ./dist/sihm*.whl
 
     upload_wheels:
         name: Upload wheels to PyPI
