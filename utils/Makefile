@@ -16,6 +16,9 @@ DEB=../dist/$(DEB_PKG).deb
 RPM_PKG=sihm-$(VERSION)-1.noarch.rpm
 RPM=../dist/$(RPM_PKG)
 
+../dist:
+	mkdir -p ../dist
+
 create_completions:
 	cd ../bin; _SIHM_COMPLETE=bash_source sihm > ./_sihm_complete_bash; _SIHM_COMPLETE=zsh_source sihm > ./_sihm_complete_zsh
 
@@ -35,14 +38,14 @@ install: $(PYTHON_WHEEL_DIST)
 clean-python:
 	rm -f ../dist/*.whl
 
-$(DEB) : $(SRC_JS_FILES)
+$(DEB) : $(SRC_JS_FILES) ../dist
 	mkdir -p ../packaging/debbuild/$(DEB_PKG)
 	cp -r ../packaging/debbuild/DEBIAN  ../packaging/debbuild/$(DEB_PKG)
 	cp -r ../packaging/debbuild/usr ../packaging/debbuild/$(DEB_PKG)
 	dpkg-deb --build --root-owner-group ../packaging/debbuild/$(DEB_PKG)
 	cp ../packaging/debbuild/*.deb ../dist/
 
-$(RPM) : $(SRC_JS_FILES)
+$(RPM) : $(SRC_JS_FILES) ../dist
 	sed -i 's/Version:.*/Version: $(VERSION)/g' ../packaging/rpmbuild/SPECS/sihm.spec
 	cd ../packaging/rpmbuild/SOURCES; mkdir -p sihm-$(VERSION); cd sihm-$(VERSION); cp ../../../../bin/_sihm* .; cd ..; tar -czvf sihm-$(VERSION).tar.gz sihm-$(VERSION); rm -rf sihm-$(VERSION)
 	cd ../packaging/rpmbuild; rpmbuild --define "_topdir `pwd`" -ba SPECS/sihm.spec
