@@ -8,7 +8,7 @@ URL:           https://github.com/leakec/sihm
 Source0:        sihm-%{version}.tar.gz
 
 #BuildRequires:  
-Requires: yarn, make, nodejs >= 16
+Requires: yarnpkg, make, nodejs >= 16
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
