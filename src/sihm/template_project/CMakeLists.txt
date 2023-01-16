@@ -29,9 +29,7 @@ add_custom_command(
     OUTPUT
         "${CMAKE_BINARY_DIR}/dist/main.js"
     COMMAND
-        ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/src
-    COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/*.js ${CMAKE_BINARY_DIR}/src
+        ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
     COMMAND
         yarn webpack
     DEPENDS

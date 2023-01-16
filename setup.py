@@ -1,6 +1,5 @@
 import sys
 from os import path
-import numpy
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_py import build_py as _build_py
 from glob import glob
@@ -37,7 +36,8 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"": ["src/sihm/py.typed"]},
-    scripts=["bin/sihm"],
+    #scripts=["bin/sihm"],
+    entry_points={"console_scripts": ["sihm=sihm.test:__main__"]},
     include_package_data=True,
     install_requires=[
         "click",
