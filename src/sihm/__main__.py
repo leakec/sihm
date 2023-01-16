@@ -6,14 +6,12 @@ from typing import Any, Dict
 from copy import deepcopy
 from pathlib import Path
 
-def __main__():
 
-    print("test")
+def main():
 
     options = {}
     output_type = ""
     cfg_file = ""
-
 
     def _get_default(cli) -> Dict[Any, Any]:
         """
@@ -26,7 +24,6 @@ def __main__():
                 default_dict[cmd_name][opt.name] = opt.default
 
         return default_dict
-
 
     def _merge_dict(d1: Dict[Any, Any], d2: Dict[Any, Any], copy: bool = True) -> Dict[Any, Any]:
         """
@@ -46,13 +43,11 @@ def __main__():
                 d3[k] = v
         return d3
 
-
     def _add_options(cmd, opts):
         """
         Adds options to global options.
         """
         options[cmd] = opts
-
 
     def input_cb(ctx, opt, val) -> None:
         """
@@ -60,7 +55,6 @@ def __main__():
         """
         nonlocal cfg_file
         cfg_file = val
-
 
     def param_cb(ctx, opt, val):
         """
@@ -96,7 +90,6 @@ def __main__():
             def params(ctx, **kwargs):
                 _add_options("params", kwargs)
 
-
     @click.group(
         name="sihm",
         invoke_without_command=True,
@@ -124,7 +117,6 @@ def __main__():
     def cli(ctx, **kwargs):
         pass
 
-
     run = cli(standalone_mode=False)
     if isinstance(run, int):
         import sys
@@ -133,7 +125,6 @@ def __main__():
     else:
         default_opts = _get_default(cli)
         options = _merge_dict(default_opts, options)
-
 
     def _parse_file(cfg_file: Path, file_name: str):
         """
@@ -150,7 +141,6 @@ def __main__():
 
         parser = SihmParser(cfg_file, file_name)
         parser.write_file()
-
 
     def _make_project(directory: Path) -> None:
         """
@@ -173,7 +163,6 @@ def __main__():
 
         # Parse the cfg_file and create the index.js file
         _parse_file(Path(cfg_file), file_name)
-
 
     if output_type == "project":
         # If user wants the standalone project only
@@ -199,7 +188,7 @@ def __main__():
         os.chdir(project_dir)
         if os.name == "nt":
             # Using windows
-            os.system("cmake . -G \"MinGW Makefiles\"")
+            os.system('cmake . -G "MinGW Makefiles"')
         else:
             os.system("cmake .")
         os.system(f"make all -j {options['params']['jobs']}")

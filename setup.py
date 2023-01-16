@@ -36,8 +36,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"": ["src/sihm/py.typed"]},
-    #scripts=["bin/sihm"],
-    entry_points={"console_scripts": ["sihm=sihm.test:__main__"]},
+    entry_points={"console_scripts": ["sihm=sihm.__main__:main"]},
     include_package_data=True,
     install_requires=[
         "click",
