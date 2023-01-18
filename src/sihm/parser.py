@@ -274,48 +274,47 @@ render();
 
         self._file.write(f"// {name} object\n")
         geo = obj.get("GEOMETRY", None)
-        if geo:
-            # Geometry
-            if geo.get("FUNCTION", None):
-                geo_args = ",".join([str(x) for x in geo["ARGS"]])
-                self._file.write(
-                    f"var {name}_geometry = new THREE.{geo['FUNCTION']}({geo_args});\n"
-                )
+        mat = obj.get("MATERIAL", None)
 
-                # Material
+        # Material
+        if mat:
+            if mat.get("FILE", None):
+                js_name = self._addExtraFile(Path(obj["MATERIAL"]["FILE"]).resolve())
+                self._extra_imports.add(
+                    "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
+                )
+                self._extra_imports.add(
+                    "import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';\n"
+                )
+                self._extra_imports.add("import { " + js_name + " } from './" + js_name + "';\n")
+                self._extra_beginning_boilerplate.add("const OBJ_LOADER = new OBJLoader();\n")
+                self._extra_beginning_boilerplate.add("const MTL_LOADER = new MTLLoader();\n")
+                self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
+
+            elif mat.get("FUNCTION", None):
                 mat = obj["MATERIAL"]
                 mat_args = ",".join([str(x) for x in mat["ARGS"]])
                 self._file.write(
                     f"var {name}_material = new THREE.{mat['FUNCTION']}({mat_args});\n"
                 )
 
-                # Object
+        # Geometry
+        if geo:
+            if geo.get("FUNCTION", None):
+                geo_args = ",".join([str(x) for x in geo["ARGS"]])
                 self._file.write(
-                    f"var {name} = new THREE.Mesh({name}_geometry, {name}_material);\n"
+                    f"var {name}_geometry = new THREE.{geo['FUNCTION']}({geo_args});\n"
                 )
-            elif geo.get("FILE", None):
-                # Material
-                if obj.get("MATERIAL", None):
-                    if obj["MATERIAL"].get("FILE", None):
-                        js_name = self._addExtraFile(Path(obj["MATERIAL"]["FILE"]).resolve())
-                        self._extra_imports.add(
-                            "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
-                        )
-                        self._extra_imports.add(
-                            "import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';\n"
-                        )
-                        self._extra_imports.add(
-                            "import { " + js_name + " } from './" + js_name + "';\n"
-                        )
-                        self._extra_beginning_boilerplate.add(
-                            "const OBJ_LOADER = new OBJLoader();\n"
-                        )
-                        self._extra_beginning_boilerplate.add(
-                            "const MTL_LOADER = new MTLLoader();\n"
-                        )
-                        self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
 
                 # Object
+                if mat:
+                    self._file.write(
+                        f"var {name} = new THREE.Mesh({name}_geometry, {name}_material);\n"
+                    )
+                else:
+                    self._file.write(f"var {name} = new THREE.Mesh({name}_geometry);\n")
+
+            elif geo.get("FILE", None):
                 js_name = self._addExtraFile(Path(geo["FILE"]).resolve())
                 self._extra_imports.add(
                     "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
@@ -323,6 +322,7 @@ render();
                 self._extra_imports.add("import { " + js_name + " } from './" + js_name + "';\n")
                 self._extra_beginning_boilerplate.add("const OBJ_LOADER = new OBJLoader();\n")
 
+                # Object
                 self._file.write(f"var {name} = OBJ_LOADER.parse({js_name});\n")
 
             # Add object to parent and get uuid
