@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any, IO, Set
+from typing import Dict, Any, Set, List, Union
 from pathlib import Path
 
 
@@ -248,14 +248,33 @@ render();
     def _writeMaterialFile(self):
         pass
 
+    def _processArgs(self, args: Union[List[Any], Dict[Any, Any]]) -> str:
+        """
+        Take arguments and return them as a string ready to be passed into a JavaScript function.
+
+        Parameters
+        ----------
+        args : Union[List[Any], Dict[Any, Any]]
+            Function arguments in list or dictionary form.
+
+        Returns
+        -------
+        str
+            Arguments as a string ready to be passed into a JavaScript function.
+        """
+        if isinstance(args, dict):
+            return ",".join([f"{k}: {v}" for k, v in args.items()])
+        else:
+            return ",".join([str(x) for x in args])
+
     def _createLight(self, name: str, light: Dict[Any, Any], parent="scene") -> None:
         if light.get("FUNCTION", None):
-            light_args = ",".join([str(x) for x in light["ARGS"]])
+            light_args = self._processArgs(light["ARGS"])
             self._file.write(f"var {name}_light = new THREE.{light['FUNCTION']}({light_args});\n")
             self._file.write(f"{parent}.add({name}_light);\n")
 
             if light.get("POSITION", None):
-                pos = ", ".join([str(x) for x in light["POSITION"]])
+                pos = self._processArgs(light["POSITION"])
                 self._file.write(f"{name}_light.position.set({pos});\n")
 
     def _createObject(self, name: str, obj: Dict[Any, Any], parent="scene") -> None:
@@ -293,7 +312,7 @@ render();
 
             elif mat.get("FUNCTION", None):
                 mat = obj["MATERIAL"]
-                mat_args = ",".join([str(x) for x in mat["ARGS"]])
+                mat_args = self._processArgs(mat["ARGS"])
                 self._file.write(
                     f"var {name}_material = new THREE.{mat['FUNCTION']}({mat_args});\n"
                 )
@@ -301,7 +320,7 @@ render();
         # Geometry
         if geo:
             if geo.get("FUNCTION", None):
-                geo_args = ",".join([str(x) for x in geo["ARGS"]])
+                geo_args = self._processArgs(geo["ARGS"])
                 self._file.write(
                     f"var {name}_geometry = new THREE.{geo['FUNCTION']}({geo_args});\n"
                 )
