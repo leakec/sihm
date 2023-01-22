@@ -40,6 +40,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "click",
+        "pyyaml",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
