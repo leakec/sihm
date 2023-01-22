@@ -33,7 +33,7 @@ $(PYTHON_WHEEL_DIST): $(SRC_JS_FILES) $(PYTHON_PKG_FILES)
 	cd ../; python setup.py bdist_wheel
 
 install: $(PYTHON_WHEEL_DIST)
-	pip install ../dist/*.whl --force
+	pip uninstall -y sihm; pip install ../dist/*.whl
 
 clean-python:
 	rm -f ../dist/*.whl
