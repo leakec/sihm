@@ -22,6 +22,8 @@ jobs:
                   name: deb
             - name: Install wheel
               run: pip install sihm*.whl
+            - name: Manually install nodejs # Needed since package version is lower than 16
+              run: "sudo apt install -y curl && curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - && sudo apt install -y nodejs"
             - name: Install package
               run: sudo apt install -f ./sihm*.deb
             - name: Run sihm
