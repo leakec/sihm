@@ -23,7 +23,7 @@ jobs:
             - name: Install wheel
               run: pip install sihm*.whl
             - name: Install package
-              run: sudo apt install -f sihm*.deb
+              run: sudo apt install -f ./sihm*.deb
             - name: Run sihm
               run: sihm -i tests/test.yaml
             - name: Check passed
