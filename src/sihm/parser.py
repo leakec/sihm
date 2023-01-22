@@ -311,8 +311,42 @@ render();
                 self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
 
             elif mat.get("FUNCTION", None):
-                mat = obj["MATERIAL"]
-                mat_args = self._processArgs(mat["ARGS"])
+
+                # Setup function arguments
+                if mat["FUNCTION"] == "ShaderMaterial":
+                    # ShaderMaterial is a special case, since the user may point to files that store
+                    # the vertex and fragment shader rather than passing in strings.
+                    args = mat["ARGS"]
+                    if isinstance(args, dict):
+                        vs = args.get("vertexShader", None)
+                        fs = args.get("fragmentShader", None)
+                        if vs is not None:
+                            if "main()" not in vs:
+                                # User has given vertex shader as a file
+                                # Add this to the list of known files and save as a java variable.
+                                js_name = self._addExtraFile(Path(vs).resolve())
+                                self._extra_imports.add(
+                                    "import { " + js_name + " } from './" + js_name + "';\n"
+                                )
+                                args["vertexShader"] = js_name
+                        if fs is not None:
+                            if "main()" not in fs:
+                                # User has given fragment shader as a file
+                                # Add this to the list of known files and save as a java variable.
+                                js_name = self._addExtraFile(Path(fs).resolve())
+                                self._extra_imports.add(
+                                    "import { " + js_name + " } from './" + js_name + "';\n"
+                                )
+                                args["fragmentShader"] = js_name
+                    else:
+                        raise ValueError(
+                            "Arguments to ShaderMaterial must be given as a dictionary."
+                        )
+                    mat_args = "{" + self._processArgs(args) + "}"
+                else:
+                    mat_args = self._processArgs(mat["ARGS"])
+
+                # Create material
                 self._file.write(
                     f"var {name}_material = new THREE.{mat['FUNCTION']}({mat_args});\n"
                 )
