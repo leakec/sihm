@@ -27,6 +27,6 @@ jobs:
             - name: Install package
               run: sudo apt install -f ./sihm*.deb
             - name: Run sihm
-              run: sihm -i tests/test.yaml
+              run: sihm -i tests/test_system/test.yaml
             - name: Check passed
-              run: test -e tests/test.html
+              run: test -e tests/test_system/test.html
