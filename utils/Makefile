@@ -39,6 +39,7 @@ clean-python:
 	rm -f ../dist/*.whl
 
 $(DEB) : $(SRC_JS_FILES) ../dist
+	sed -i 's/Version:.*/Version: $(VERSION)/g' ../packaging/debbuild/DEBIAN/control
 	mkdir -p ../packaging/debbuild/$(DEB_PKG)
 	cp -r ../packaging/debbuild/DEBIAN  ../packaging/debbuild/$(DEB_PKG)
 	cp -r ../packaging/debbuild/usr ../packaging/debbuild/$(DEB_PKG)
