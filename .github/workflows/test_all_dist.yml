@@ -1,5 +1,9 @@
 name: Test distribution packages
 
+on:
+    workflow_dispatch:
+    workflow_call:
+
 jobs:
     build_distribution_packages:
         uses: ./.github/workflows/build_all_dist.yml
