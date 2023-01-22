@@ -26,9 +26,10 @@ OBJECTS:
                 - 30
                 - 30
         MATERIAL:
-            FUNCTION: MeshBasicMaterial
+            FUNCTION: ShaderMaterial
             ARGS:
-                - "{color: 0xffff00}"
+                vertexShader: normal_shader.vert
+                fragmentShader: normal_shader.frag
         ANIMATIONS:
             position:
                 - [0, 1, 2]
