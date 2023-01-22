@@ -1,5 +1,5 @@
 Name: sihm
-Version: 0.0.1
+Version: 0.0.2
 Release:        1%{?dist}
 Summary: Standalone Interactive HMTL Movie (SIHM) maker
 
@@ -8,7 +8,7 @@ URL:           https://github.com/leakec/sihm
 Source0:        sihm-%{version}.tar.gz
 
 #BuildRequires:  
-Requires: yarnpkg, make, nodejs >= 16
+Requires: yarnpkg, cmake, make, nodejs >= 16
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
