@@ -16,6 +16,8 @@ DEB=../dist/$(DEB_PKG).deb
 RPM_PKG=sihm-$(VERSION)-1.noarch.rpm
 RPM=../dist/$(RPM_PKG)
 
+BREW=../dist/sihm.rb
+
 ../dist:
 	mkdir -p ../dist
 
@@ -52,9 +54,15 @@ $(RPM) : $(SRC_JS_FILES) ../dist
 	cd ../packaging/rpmbuild; rpmbuild --define "_topdir `pwd`" -ba SPECS/sihm.spec
 	cp ../packaging/rpmbuild/RPMS/noarch/sihm-* ../dist/
 
+$(BREW) : $(SRC_JS_FILES) ../dist
+	sed -i 's/version .*/version "$(VERSION)"/g' ../packaging/sihm.rb
+	cp ../packaging/sihm.rb ../dist/
+
 deb: $(DEB)
 
 rpm : $(RPM)
+
+brew : $(BREW)
 
 clean-deb:
 	rm -rf ../packaging/debbuild/$(DEB_PKG)
@@ -65,7 +73,7 @@ clean-rpm:
 	rm -rf ../packaging/rpmbuild/RPMS 
 	rm -rf ../packaging/rpmbuild/SRPMS
 
-dist: $(PYTHON_WHEEL_DIST) deb rpm
+dist: $(PYTHON_WHEEL_DIST) deb rpm brew
 
 clean: clean-python clean-rpm clean-deb
 
