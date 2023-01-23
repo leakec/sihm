@@ -65,7 +65,10 @@ jobs:
               with:
                   name: wheel
             - name: Install wheel
-              run: pip install sihm*
+              run: |
+                  dir sihm* > temp_file.txt
+                  set /p WHL= < temp_file.txt
+                  pip install %WHL%
             - uses: actions/setup-node@v3
               with:
                   node-version: 16
