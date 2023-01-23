@@ -13,9 +13,6 @@ class Sihm < Formula
   depends_on "make"
 
   def install
-    # Needed so the brew package "does something, i.e., we don't get an empty error"
-    system "./configure --prefix=#{prefix}"
-
     # Zsh tab completion
     zsh_complete_text = %{
 ZSH_COMPLETION_VARIABLE
@@ -33,5 +30,9 @@ BASH_COMPLETION_VARIABLE
 }
     file = "/opt/local/etc/bash_completion.d/_sihm_complete_bash"
     f = File.open(file,'w'); f.write(zsh_complete_text); f.close
+
+    # Needed so the brew package "does something, i.e., we don't get an empty error"
+    system "touch #{prefix}/empty_file.txt"
+
   end
 end
