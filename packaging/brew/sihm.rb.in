@@ -18,18 +18,25 @@ class Sihm < Formula
 ZSH_COMPLETION_VARIABLE
 }
     if Dir.exist?('/usr/share/zsh/5.3/')
+      dir = "/usr/share/zsh/5.3/functions/"
       file = "/usr/share/zsh/5.3/functions/_sihm_complete_zsh"
     else
+      dir = "/usr/share/zsh/5.7/functions/"
       file = "/usr/share/zsh/5.7/functions/_sihm_complete_zsh"
     end
-    f = File.open(file,'w'); f.write(zsh_complete_text); f.close
+    if Dir.exist?(dir)
+      f = File.open(file,'w'); f.write(zsh_complete_text); f.close
+    end
 
     # Bash tab completion
     bash_complete_text = %{
 BASH_COMPLETION_VARIABLE
 }
     file = "/opt/local/etc/bash_completion.d/_sihm_complete_bash"
-    f = File.open(file,'w'); f.write(zsh_complete_text); f.close
+    dir = "/opt/local/etc/bash_completion.d/"
+    if Dir.exist?(dir)
+      f = File.open(file,'w'); f.write(zsh_complete_text); f.close
+    end
 
     # Needed so the brew package "does something, i.e., we don't get an empty error"
     system "touch #{prefix}/empty_file.txt"
