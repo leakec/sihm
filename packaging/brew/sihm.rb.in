@@ -11,9 +11,11 @@ class Sihm < Formula
   depends_on "node"
   depends_on "cmake"
   depends_on "make"
-  depends_on "sihm" => :python
 
   def install
+    # Needed so the brew package "does something, i.e., we don't get an empty error"
+    system "./configure --prefix=#{prefix}"
+
     # Zsh tab completion
     zsh_complete_text = %{
 ZSH_COMPLETION_VARIABLE
