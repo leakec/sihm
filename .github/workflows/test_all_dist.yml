@@ -7,53 +7,52 @@ on:
 jobs:
     build_distribution_packages:
         uses: ./.github/workflows/build_all_dist.yml
-    #Commenting out for now while I fix other build systems
-    #test_ubuntu:
-    #    name: Test wheels on Ubuntu
-    #    needs: [build_distribution_packages]
-    #    runs-on: ubuntu-latest
-    #    steps:
-    #        - uses: actions/checkout@v3
-    #        - uses: actions/setup-python@v3
-    #        - uses: actions/download-artifact@v3
-    #          with:
-    #              name: wheel
-    #        - uses: actions/download-artifact@v3
-    #          with:
-    #              name: deb
-    #        - name: Install wheel
-    #          run: pip install sihm*.whl
-    #        - name: Manually install nodejs # Needed since package version is lower than 16
-    #          run: "sudo apt install -y curl && curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - && sudo apt install -y nodejs"
-    #        - name: Install package
-    #          run: sudo apt install -f ./sihm*.deb
-    #        - name: Run sihm
-    #          run: sihm -i tests/test_system/test.yaml
-    #        - name: Check passed
-    #          run: test -e tests/test_system/test.html
-    #test_mac:
-    #    name: Test wheels on Mac
-    #    needs: [build_distribution_packages]
-    #    runs-on: macos-latest
-    #    steps:
-    #        - uses: actions/checkout@v3
-    #        - uses: actions/setup-python@v3
-    #        - uses: actions/download-artifact@v3
-    #          with:
-    #              name: wheel
-    #        - uses: actions/download-artifact@v3
-    #          with:
-    #              name: brew
-    #        - name: Install wheel
-    #          run: pip install sihm*.whl
-    #        - name: Install package
-    #          run: |
-    #              brew update
-    #              brew install ./sihm*.rb
-    #        - name: Run sihm
-    #          run: sihm -i tests/test_system/test.yaml
-    #        - name: Check passed
-    #          run: test -e tests/test_system/test.html
+    test_ubuntu:
+        name: Test wheels on Ubuntu
+        needs: [build_distribution_packages]
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-python@v3
+            - uses: actions/download-artifact@v3
+              with:
+                  name: wheel
+            - uses: actions/download-artifact@v3
+              with:
+                  name: deb
+            - name: Install wheel
+              run: pip install sihm*.whl
+            - name: Manually install nodejs # Needed since package version is lower than 16
+              run: "sudo apt install -y curl && curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - && sudo apt install -y nodejs"
+            - name: Install package
+              run: sudo apt install -f ./sihm*.deb
+            - name: Run sihm
+              run: sihm -i tests/test_system/test.yaml
+            - name: Check passed
+              run: test -e tests/test_system/test.html
+    test_mac:
+        name: Test wheels on Mac
+        needs: [build_distribution_packages]
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-python@v3
+            - uses: actions/download-artifact@v3
+              with:
+                  name: wheel
+            - uses: actions/download-artifact@v3
+              with:
+                  name: brew
+            - name: Install wheel
+              run: pip install sihm*.whl
+            - name: Install package
+              run: |
+                  brew update
+                  brew install ./sihm*.rb
+            - name: Run sihm
+              run: sihm -i tests/test_system/test.yaml
+            - name: Check passed
+              run: test -e tests/test_system/test.html
     test_windows:
         name: Test wheels on Windows
         needs: [build_distribution_packages]
