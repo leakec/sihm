@@ -65,9 +65,7 @@ jobs:
               with:
                   name: wheel
             - name: Install wheel
-              run: |
-                  dir sihm* > temp_file.txt
-                  Get-Content temp_file.txt | & pip install
+              run: pip install (get-item .\sihm*.whl).FullName
             - uses: actions/setup-node@v3
               with:
                   node-version: 16
