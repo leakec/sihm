@@ -55,7 +55,7 @@ jobs:
     #        - name: Check passed
     #          run: test -e tests/test_system/test.html
     test_windows:
-        name: Test wheels on Mac
+        name: Test wheels on Windows
         needs: [build_distribution_packages]
         runs-on: windows-latest
         steps:
@@ -65,7 +65,7 @@ jobs:
               with:
                   name: wheel
             - name: Install wheel
-              run: pip install sihm*.whl
+              run: pip install sihm*
             - uses: actions/setup-node@v3
               with:
                   node-version: 16
