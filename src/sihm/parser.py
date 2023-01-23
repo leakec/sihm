@@ -107,6 +107,7 @@ render();
         fileName : str
             Output file name.
         """
+        self._cfg_path = cfg_file.parents[0]
         self._readData(cfg_file)
         self._file = open(fileName, "w+")
         self._path = Path(fileName.replace("index.js", ""))
@@ -202,7 +203,7 @@ render();
 
         return "".join(text)
 
-    def _addExtraFile(self, file: str) -> str:
+    def _addExtraFile(self, file: Union[str, Path]) -> str:
         """
         Adds file to _file_dict if it does not exist. This entails
         creating a SIHM_EXTRA_FILE_*.js file that contains a single string
@@ -298,7 +299,9 @@ render();
         # Material
         if mat:
             if mat.get("FILE", None):
-                js_name = self._addExtraFile(Path(obj["MATERIAL"]["FILE"]).resolve())
+                js_name = self._addExtraFile(
+                    self._cfg_path.joinpath(Path(obj["MATERIAL"]["FILE"])).resolve()
+                )
                 self._extra_imports.add(
                     "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
                 )
@@ -324,7 +327,9 @@ render();
                             if "main()" not in vs:
                                 # User has given vertex shader as a file
                                 # Add this to the list of known files and save as a java variable.
-                                js_name = self._addExtraFile(Path(vs).resolve())
+                                js_name = self._addExtraFile(
+                                    self._cfg_path.joinpath(Path(vs)).resolve()
+                                )
                                 self._extra_imports.add(
                                     "import { " + js_name + " } from './" + js_name + "';\n"
                                 )
@@ -333,7 +338,9 @@ render();
                             if "main()" not in fs:
                                 # User has given fragment shader as a file
                                 # Add this to the list of known files and save as a java variable.
-                                js_name = self._addExtraFile(Path(fs).resolve())
+                                js_name = self._addExtraFile(
+                                    self._cfg_path.joinpath(Path(fs)).resolve()
+                                )
                                 self._extra_imports.add(
                                     "import { " + js_name + " } from './" + js_name + "';\n"
                                 )
@@ -368,7 +375,7 @@ render();
                     self._file.write(f"var {name} = new THREE.Mesh({name}_geometry);\n")
 
             elif geo.get("FILE", None):
-                js_name = self._addExtraFile(Path(geo["FILE"]).resolve())
+                js_name = self._addExtraFile(self._cfg_path.joinpath(Path(geo["FILE"])).resolve())
                 self._extra_imports.add(
                     "import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';\n"
                 )
