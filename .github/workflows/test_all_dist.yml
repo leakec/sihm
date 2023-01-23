@@ -7,6 +7,7 @@ on:
 jobs:
     build_distribution_packages:
         uses: ./.github/workflows/build_all_dist.yml
+    #Commenting out for now while I fix other build systems
     #test_ubuntu:
     #    name: Test wheels on Ubuntu
     #    needs: [build_distribution_packages]
@@ -30,25 +31,44 @@ jobs:
     #          run: sihm -i tests/test_system/test.yaml
     #        - name: Check passed
     #          run: test -e tests/test_system/test.html
-    test_mac:
+    #test_mac:
+    #    name: Test wheels on Mac
+    #    needs: [build_distribution_packages]
+    #    runs-on: macos-latest
+    #    steps:
+    #        - uses: actions/checkout@v3
+    #        - uses: actions/setup-python@v3
+    #        - uses: actions/download-artifact@v3
+    #          with:
+    #              name: wheel
+    #        - uses: actions/download-artifact@v3
+    #          with:
+    #              name: brew
+    #        - name: Install wheel
+    #          run: pip install sihm*.whl
+    #        - name: Install package
+    #          run: |
+    #              brew update
+    #              brew install ./sihm*.rb
+    #        - name: Run sihm
+    #          run: sihm -i tests/test_system/test.yaml
+    #        - name: Check passed
+    #          run: test -e tests/test_system/test.html
+    test_windows:
         name: Test wheels on Mac
         needs: [build_distribution_packages]
-        runs-on: macos-latest
+        runs-on: windows-latest
         steps:
             - uses: actions/checkout@v3
             - uses: actions/setup-python@v3
             - uses: actions/download-artifact@v3
               with:
                   name: wheel
-            - uses: actions/download-artifact@v3
-              with:
-                  name: brew
             - name: Install wheel
               run: pip install sihm*.whl
-            - name: Install package
-              run: |
-                  brew update
-                  brew install ./sihm*.rb
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 16
             - name: Run sihm
               run: sihm -i tests/test_system/test.yaml
             - name: Check passed
