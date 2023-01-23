@@ -55,8 +55,9 @@ $(RPM) : $(SRC_JS_FILES) ../dist
 	cp ../packaging/rpmbuild/RPMS/noarch/sihm-* ../dist/
 
 $(BREW) : $(SRC_JS_FILES) ../dist
-	sed -i 's/version .*/version "$(VERSION)"/g' ../packaging/sihm.rb
-	cp ../packaging/sihm.rb ../dist/
+	cd ../packaging/brew && ./add_completion
+	sed -i 's/version .*/version "$(VERSION)"/g' ../packaging/brew/sihm.rb
+	mv ../packaging/brew/sihm.rb ../dist/
 
 deb: $(DEB)
 

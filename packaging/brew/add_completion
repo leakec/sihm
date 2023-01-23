@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+# Read in original contents
+with open("./sihm.rb.in") as f:
+    brew = f.read()
+
+# Add in zsh_complete
+with open("../../bin/_sihm_complete_zsh") as f:
+    zsh_complete = f.read()
+brew = brew.replace("ZSH_COMPLETION_VARIABLE", zsh_complete)
+
+# Add in bash complete
+with open("../../bin/_sihm_complete_bash") as f:
+    bash_complete = f.read()
+brew = brew.replace("BASH_COMPLETION_VARIABLE", bash_complete)
+
+# Write final file
+with open("./sihm.rb", "w") as f:
+    f.write(brew)
