@@ -1,4 +1,4 @@
-name: Publish DEB, RPM, and binary wheel
+name: Publish binary wheel and distribution packages
 
 on:
     release:
