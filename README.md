@@ -23,14 +23,18 @@ Examples of `sihm`'s output can be found [here](https://leakec.github.io/sihm).
 
 ### Linux
 
--   `pip install sihm`
+-   Install the python package: `pip install sihm`
 -   Install the appropriate package&mdash;`rpm` or `deb`, depending on you OS&mdash; from the latest release.
 
-### Mac / Windows
+### Mac
 
+-   Install the python package: `pip install sihm`
+-   Download and install the brew package from the latest release, e.g., `brew install sihm*.rb`.
+
+### Windows
+
+-   Install the python package: `pip install sihm`
 -   Install the system dependencies
     -   yarn
     -   nodejs >= 16
     -   cmake
--   Install the python package: `pip install sihm`
--   If you want tab completion on Mac, then copy the appropriate file from the `bin` folder into the appropriate spot. Tab completion is available for `bash` and `zsh`.
