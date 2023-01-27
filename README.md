@@ -2,6 +2,7 @@
 
 **A highly-portable, interactive way to visualize your simulations.**
 
+![Continuous integration](https://github.com/leakec/sihm/actions/workflows/test_all_dist.yml/badge.svg)
 ![PyPI version](https://img.shields.io/pypi/v/sihm)
 
 [**Summary**](#summary) | [**Examples**](https://leakec.github.io/sihm) | [**Installation guide**](#installation)
