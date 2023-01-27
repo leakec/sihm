@@ -7,7 +7,7 @@ on:
     workflow_dispatch:
 jobs:
     build_and_test_distribution_packages:
-        uses: ./.github/workflows/test_all_dist.yml
+        uses: ./.github/workflows/ci.yml
     publish_dist_pkgs:
         name: Publish distribution packages
         needs: [build_and_test_distribution_packages]

@@ -6,7 +6,7 @@ on:
 
 jobs:
     build_and_test_distribution_packages:
-        uses: ./.github/workflows/test_all_dist.yml
+        uses: ./.github/workflows/ci.yml
     upload_wheels:
         name: Upload wheels to PyPI
         runs-on: ubuntu-latest
