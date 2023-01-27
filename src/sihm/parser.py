@@ -166,8 +166,29 @@ render();
         self._file.writelines(old_text)
         self._file.seek(curr_pos)
 
-    def _readMtlFile(self, file: str) -> str:
+    def _getImageURI(self, img_file: Path) -> str:
+        """
+        Reads the data from an image file and returns the associated URI.
+
+        Parameters
+        ----------
+        img_file : Path
+            Path to the image file
+
+        Returns
+        -------
+        str
+            Image URI.
+        """
+
         import base64
+
+        suffix = img_file.suffix[1:]
+        with open(img_file, "rb") as f:
+            encoded_string = base64.b64encode(f.read())
+        return "data:image/" + suffix + ";base64," + encoded_string.decode("utf-8")
+
+    def _readMtlFile(self, file: str) -> str:
 
         """
         Reads the data of an MTL file, and embeds any images as base64.
@@ -189,17 +210,7 @@ render();
             if "map_" in line:
                 pieces = line.split(" ")
                 img_file = Path(os.path.join(base, pieces[1]))
-                suffix = img_file.suffix[1:]
-                with open(img_file, "rb") as f:
-                    encoded_string = base64.b64encode(f.read())
-                text[k] = (
-                    pieces[0]
-                    + " "
-                    + "data:image/"
-                    + suffix
-                    + ";base64,"
-                    + encoded_string.decode("utf-8")
-                )
+                text[k] = pieces[0] + " " + self._getImageURI(img_file)
 
         return "".join(text)
 
@@ -267,6 +278,48 @@ render();
             return ",".join([f"{k}: {v}" for k, v in args.items()])
         else:
             return ",".join([str(x) for x in args])
+
+    def _addSceneProp(self, prop: str, data: Any):
+        if prop == "background":
+            # Background property
+            if isinstance(data, list) or isinstance(data, tuple):
+                if len(data) == 6:
+                    # Cube texture
+                    self._extra_beginning_boilerplate.add(
+                        "const CUBE_TEXTURE_LOADER = new THREE.CubeTextureLoader();\n"
+                    )
+                    self._file.write(f"scene.{prop} = CUBE_TEXTURE_LOADER.load( [\n")
+                    for file in data:
+                        img_file = self._cfg_path.joinpath(Path(file))
+                        self._file.write(f'"{self._getImageURI(img_file)}", \n')
+                    self._file.write("] );\n")
+                else:
+                    # Color
+                    color = ",".join(data)
+                    self._file.write(f"scene.{prop} = new THREE.Color({color});\n")
+            elif "." in str(data):
+                # Texture
+                self._extra_beginning_boilerplate.add(
+                    "const TEXTURE_LOADER = new THREE.TextureLoader();\n"
+                )
+                img_file = self._cfg_path.joinpath(Path(data))
+                self._file.write(
+                    f'scene.{prop} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
+                )
+            else:
+                # Color
+                import re
+
+                regex = "^0x[A-Fa-f0-9]{6}$"
+                pattern = re.compile(regex)
+                if pattern.match(str(data)):
+                    # Hex number
+                    self._file.write(f"scene.{prop} = new THREE.Color({data});\n")
+                else:
+                    self._file.write(f'scene.{prop} = new THREE.Color("{data}");\n')
+        else:
+            # All other properties
+            self._file.write(f"scene.{prop} = {data};\n")
 
     def _createLight(self, name: str, light: Dict[Any, Any], parent="scene") -> None:
         if light.get("FUNCTION", None):
@@ -425,12 +478,16 @@ render();
         loc = self._file.tell()
         self._file.write(self._beginning_boilerplate)
 
+        # Set scene properties
+        for prop, data in self._data.get("SCENE", {}).items():
+            self._addSceneProp(prop, data)
+
         # Create objects and animations
-        for name, obj in self._data["OBJECTS"].items():
+        for name, obj in self._data.get("OBJECTS", {}).items():
             self._createObject(name, obj, parent="scene")
 
         # Create lights
-        for name, light in self._data["LIGHTS"].items():
+        for name, light in self._data.get("LIGHTS", {}).items():
             self._createLight(name, light, parent="scene")
 
         # Add in extra beginning boilerplate.
