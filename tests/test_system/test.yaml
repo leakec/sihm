@@ -1,3 +1,6 @@
+SIHM:
+    show_stats: True
+    extra_modules: three # Adding a module that already exitst here just to show this option works
 SCENE:
     background:
         - ../../common/sh_f.png
