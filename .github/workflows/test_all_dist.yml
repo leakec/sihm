@@ -32,7 +32,7 @@ jobs:
     #          run: test -e tests/test_system/test.html
     test_fedora:
         runs-on: ubuntu-latest
-        container: fedora:35
+        container: fedora:36
         needs: [build_distribution_packages]
         steps:
             - uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
               with:
                   name: rpm
             - name: Install wheel
-              run: python -m pip install sihm*.whl
+              run: pip install sihm*.whl
             - name: Manually install nodejs # Needed since package version is lower than 16
               run: "sudo dnf module install nodejs:16/common"
             - name: Install package
