@@ -2,7 +2,7 @@
 
 import os
 import click
-from typing import Any, Dict
+from typing import Any, Dict, Set
 from copy import deepcopy
 from pathlib import Path
 
@@ -126,7 +126,7 @@ def main():
         default_opts = _get_default(cli)
         options = _merge_dict(default_opts, options)
 
-    def _parse_file(cfg_file: Path, file_name: str):
+    def _parse_file(cfg_file: Path, file_name: str) -> Set[str]:
         """
         Parse the file to create index.js
 
@@ -141,6 +141,7 @@ def main():
 
         parser = SihmParser(cfg_file, file_name)
         parser.write_file()
+        return parser.extra_modules
 
     def _make_project(directory: Path) -> None:
         """
@@ -156,13 +157,26 @@ def main():
             os.makedirs(directory)
         sihm_path = Path(sihm.__file__)
         template_project = os.path.join(sihm_path.parents[0], "template_project")
-        copytree(template_project, directory.absolute(), dirs_exist_ok=True)
+        copytree(template_project, directory.resolve(), dirs_exist_ok=True)
 
         # Create path/file for index.js
-        file_name = os.path.join(directory.absolute(), "src", "index.js")
+        file_name = os.path.join(directory.resolve(), "src", "index.js")
 
         # Parse the cfg_file and create the index.js file
-        _parse_file(Path(cfg_file), file_name)
+        extra_modules = _parse_file(Path(cfg_file), file_name)
+
+        # Add extra modules to the CMakeLists file
+        if extra_modules:
+            cmake_file = directory.joinpath("CMakeLists.txt")
+            with open(cmake_file.resolve(), "r") as f:
+                lines = f.readlines()
+            for k, line in enumerate(lines):
+                if "set(EXTRA_MODULES" in line:
+                    ind = k
+                    break
+            lines[k] = 'set(EXTRA_MODULES "' + " ".join(extra_modules) + '")\n'
+            with open(cmake_file.resolve(), "w") as f:
+                f.write("".join(lines))
 
     if output_type == "project":
         # If user wants the standalone project only

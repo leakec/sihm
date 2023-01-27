@@ -45,7 +45,7 @@ var followable_objects = [];
 
 """
 
-    _ending_boilerplate = """
+    _ending_boilerplate_p1 = """
 // Add geometry to camera
 camera.addFollowableObjects(followable_objects);
 
@@ -72,7 +72,11 @@ gui.addVideoControls(pause_play, mixer);
 gui.addCameraControls(camera);
 
 const clock = new THREE.Clock();
+"""
 
+    _ending_boilerplate = (
+        _ending_boilerplate_p1
+        + """
 // Render Loop
 var render = function () {
     // Render scene
@@ -95,6 +99,35 @@ function animate() {
 controls.update();
 render();
 """
+    )
+    _ending_boilerplate_stats = (
+        _ending_boilerplate_p1
+        + """
+// Render Loop
+var render = function () {
+    // Render scene
+    stats.begin();
+    requestAnimationFrame(render);
+    animate();
+    renderer.render(scene, camera_per);
+    stats.end();
+};
+
+// Animation
+function animate() {
+    if (!paused) {
+        // Update animation
+        var delta = clock.getDelta();
+        mixer.update(delta);
+        gui.updateTime();
+        camera.update();
+    }
+}
+
+controls.update();
+render();
+"""
+    )
 
     def __init__(self, cfg_file: Path, fileName: str) -> None:
         """
@@ -114,12 +147,14 @@ render();
         self._extra_imports: Set[str] = set()
         self._extra_beginning_boilerplate: Set[str] = set()
         self._file_dict = {}
-        self._extra_file_count = 0
+        self._extra_file_count: int = 0
+        self._show_stats: bool = False
+        self.extra_modules: Set[str] = set()
 
     def __del__(self) -> None:
         self._file.close()
 
-    def _readData(self, cfg_file: Path):
+    def _readData(self, cfg_file: Path) -> None:
         """
         Read the data from a config file. The file exention is used to determine file type.
         Defaults to YAML if no extension is recognized.
@@ -278,6 +313,28 @@ render();
             return ",".join([f"{k}: {v}" for k, v in args.items()])
         else:
             return ",".join([str(x) for x in args])
+
+    def _processSihmOptions(self):
+        for k, v in self._data.get("SIHM", {}).items():
+            if k == "show_stats":
+                self._show_stats = v
+            elif k == "extra_modules":
+                if isinstance(v, list) or isinstance(v, tuple):
+                    for val in v:
+                        self.extra_modules.add(val)
+                elif isinstance(v, str):
+                    self.extra_modules.add(v)
+                else:
+                    raise ValueError(f"Not sure what to do with extra_modules argument {v}")
+            else:
+                print(f"WARNING: Encountered unknown option {k} in the SIHM section.")
+
+        if self._show_stats:
+            self._extra_imports.add('import Stats from "stats-js";\n')
+            self._extra_beginning_boilerplate.add(
+                "const stats = new Stats();\nstats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom\ndocument.body.appendChild(stats.dom);\n"
+            )
+            self.extra_modules.add("stats-js")
 
     def _addSceneProp(self, prop: str, data: Any):
         if prop == "background":
@@ -473,6 +530,9 @@ render();
         """
         from io import SEEK_END
 
+        # Process sihm options
+        self._processSihmOptions()
+
         # Write beginning boilerplate
         self._file.write(self._imports)
         loc = self._file.tell()
@@ -498,4 +558,7 @@ render();
         self._file.seek(0, SEEK_END)
 
         # Write ending boilerplate
-        self._file.write(self._ending_boilerplate)
+        if self._show_stats:
+            self._file.write(self._ending_boilerplate_stats)
+        else:
+            self._file.write(self._ending_boilerplate)

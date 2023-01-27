@@ -10,6 +10,9 @@ add_custom_target(index_html ALL
         "${CMAKE_BINARY_DIR}/dist/index.html"
 )
 
+# Extra modules
+set(EXTRA_MODULES "")
+
 # Command to build index.html
 add_custom_command(
     OUTPUT
@@ -45,5 +48,5 @@ add_custom_command(
     COMMAND
         yarn init -p -y
     COMMAND
-        yarn add three webpack webpack-cli dat.gui
+        yarn add three webpack webpack-cli dat.gui ${EXTRA_MODULES}
 )
