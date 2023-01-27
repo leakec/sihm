@@ -174,7 +174,7 @@ def main():
                 if "set(EXTRA_MODULES" in line:
                     ind = k
                     break
-            lines[k] = 'set(EXTRA_MODULES "' + " ".join(extra_modules) + '")\n'
+            lines[k] = 'set(EXTRA_MODULES "' + '" "'.join(extra_modules) + '")\n'
             with open(cmake_file.resolve(), "w") as f:
                 f.write("".join(lines))
 

@@ -48,5 +48,5 @@ add_custom_command(
     COMMAND
         yarn init -p -y
     COMMAND
-        yarn add three webpack webpack-cli dat.gui ${EXTRA_MODULES}
+        yarn add three webpack webpack-cli dat.gui ${EXTRA_MODULES} VERBATIM
 )
