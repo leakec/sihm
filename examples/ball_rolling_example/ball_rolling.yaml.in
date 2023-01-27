@@ -1,3 +1,5 @@
+SCENE:
+  background: "rgb(167, 199, 231)"
 LIGHTS:
     l1:
         FUNCTION: HemisphereLight
