@@ -1,17 +1,14 @@
 name: Publish binary wheel and distribution packages
 
 on:
-    release:
-        types: [published]
-
     workflow_dispatch:
 
 jobs:
-    build_distribution_packages:
-        uses: ./.github/workflows/build_all_dist.yml
+    build_and_test_distribution_packages:
+        uses: ./.github/workflows/test_all_dist.yml
     publish_files:
         name: Publish files
-        needs: [build_distribution_packages]
+        needs: [build_and_test_distribution_packages]
         runs-on: ubuntu-latest
         steps:
             - uses: actions/download-artifact@v3

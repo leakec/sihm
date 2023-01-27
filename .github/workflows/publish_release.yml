@@ -1,0 +1,12 @@
+name: Publish new release
+
+on:
+    release:
+        types: [published]
+
+    workflow_dispatch:
+jobs:
+    publish_dist_pkgs:
+        uses: ./.github/workflows/publish_dist_pkgs.yml
+    publish_PyPI:
+        uses: ./.github/workflows/publish_PyPI.yml
