@@ -43,6 +43,8 @@ jobs:
             - uses: actions/download-artifact@v3
               with:
                   name: rpm
+            - name: Install basic packages # Do this to make cmake happy
+              run: "sudo dnf install -y gcc gcc-c++"
             - name: Install wheel
               run: python -m pip install sihm*.whl
             - name: Manually install nodejs # Needed since package version is lower than 16
