@@ -40,6 +40,16 @@ def create_skybox(img_file: Path, img_loc: ImageLoc = img_loc_default) -> None:
     """
     Create the 6 images needed for a ThreeJS skybox from one large image.
 
+    In ThreeJS:
+    * right = +x
+    * left = -x
+    * up = +y
+    * down = -y
+    * front = +z
+    * back = -z
+    ThreeJS uses a right-handed coordiante systems where as other systems use a left-handed
+    system. Therefore, you may need to flip the positive and negative x-axes.
+
     Parameters
     ----------
     img_file : Path
