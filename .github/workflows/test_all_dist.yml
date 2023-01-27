@@ -46,7 +46,7 @@ jobs:
             - name: Install wheel
               run: python -m pip install sihm*.whl
             - name: Manually install nodejs # Needed since package version is lower than 16
-              run: "sudo dnf module install nodejs:16/common"
+              run: "sudo dnf module install -y nodejs:16/common"
             - name: Install package
               run: sudo dnf install -y ./sihm*.rpm
             - name: Run sihm
