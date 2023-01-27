@@ -3,6 +3,10 @@ name: Test distribution packages
 on:
     workflow_dispatch:
     workflow_call:
+    push:
+        paths:
+            - "src/sihm/**"
+            - "tests/**"
 
 jobs:
     build_distribution_packages:
