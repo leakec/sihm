@@ -15,14 +15,13 @@ options = {}
     context_settings={"help_option_names": ["-h", "--help"]},
 )
 @click.option(
-    "--export-obj",
-    type=bool,
+    "--export-obj/--no-export-obj",
     default=False,
     show_default=True,
     help="If true, then a new obj file will be exported.",
 )
 @click.option(
-    "--export-urdf",
+    "--export-urdf/--no-export-urdf",
     type=bool,
     default=False,
     show_default=True,
@@ -57,12 +56,26 @@ if options["export_obj"]:
 
 # Export URDF file
 if options["export_urdf"]:
+    import jinja2
+    env = jinja2.Environment()
+    with open("double_pendulum.urdf.in","r") as temp:
+        template = env.from_string(temp.read())
+
     shape = f.getObjectsByLabel("pendulum")[0].Shape
-    i = shape.MomentOfInertia
-    b2cm = shape.CenterOfMass
+    i = shape.MatrixOfInertia
+    ixx = i.A11
+    ixy = i.A12
+    ixz = i.A13
+    iyy = i.A22
+    iyz = i.A23
+    izz = i.A33
+    dark = shape.CenterOfMass
+    b2cm = " ".join([str(dark.x), str(dark.y), str(dark.z)])
     m = shape.Mass
-    pin_loc = shaft_height + bob_radius
-    pass
+    joint_loc = -(shaft_height + bob_radius)
+
+    with open("double_pendulum.urdf","w") as temp:
+        temp.write(template.render(MASS=m, B2CM=b2cm, IXX=ixx, IXY=ixy, IXZ=ixz, IYY=iyy, IYZ=iyz, IZZ=izz, JOINT_LOC=joint_loc))
 
 # Can use the command below to save the CAD part.
 # We are not saving the CAD part here, as we don't want to overwrite

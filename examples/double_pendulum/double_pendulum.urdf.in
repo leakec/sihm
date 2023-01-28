@@ -23,9 +23,9 @@
   <link name="pendulum2">
     <inertial>
       <!-- center of mass (com) is defined w.r.t. link local coordinate system -->
-      <mass value="1.0" />
-      <origin xyz="0 0 0" /> 
-      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+      <mass value="{{ MASS }}" />
+      <origin xyz="{{ B2CM }}" /> 
+      <inertia  ixx="{{ IXX }}" ixy="{{ IXY }}"  ixz="{{ IXZ }}"  iyy="{{ IYY }}"  iyz="{{ IYZ }}"  izz="{{ IZZ }}" />
     </inertial>
 	<visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -47,7 +47,7 @@
       <child link="pendulum1"/>
   </joint>
   <joint name="pendulum_joint2" type="continuous">
-      <origin xyz="0.0 -7.0 0.0" rpy="0 0 0"/>
+      <origin xyz="0.0 {{ JOINT_LOC }} 0.0" rpy="0 0 0"/>
       <axis xyz="0 0 1"/>
       <parent link="pendulum1"/>
       <child link="pendulum2"/>

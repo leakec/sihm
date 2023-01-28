@@ -4,12 +4,12 @@ import yaml
 
 # Constants
 n_steps = 30 * 240
-gui = True
-p1_init_ang = np.pi/4
+gui = False
+p1_init_ang = np.pi/2
 p2_init_ang = np.pi/4
 
 # Allcoate space for logging
-log_freq = 4
+log_freq = 10 
 n_vals = int(n_steps / log_freq)
 pos = {"p1": np.zeros((3, n_vals)), "p2": np.zeros((3, n_vals))}
 orientation = {"p1": np.zeros((4, n_vals)), "p2": np.zeros((4, n_vals))}
@@ -50,33 +50,42 @@ for i in range(n_steps):
         time[k] = i / 240.0
 
         p1 = p.getLinkState(double_pendulum, 0)
-        pos["p1"][:,k] = p1[0]
-        orientation["p1"][:,k] = p1[1]
+        pos["p1"][:,k] = p1[4]
+        orientation["p1"][:,k] = p1[5]
 
-        p2 = p.getLinkState(double_pendulum, 0)
-        pos["p2"][:,k] = p2[0]
-        orientation["p2"][:,k] = p2[1]
+        p2 = p.getLinkState(double_pendulum, 1)
+        pos["p2"][:,k] = p2[4]
+        orientation["p2"][:,k] = p2[5]
 
         k += 1
 
 # Stop the sim
-#p.disconnect()
+#if not gui:
+#    p.disconnect()
 
 # Create the sihm file
-#import yaml
+import yaml
 
-#with open("ball_rolling.yaml.in", "r") as f:
-#    data = yaml.load(f, Loader=yaml.FullLoader)
-#
-#time_str = str(time.tolist())
-#data["OBJECTS"]["sphere"]["ANIMATIONS"]["position"] = [
-#    time_str,
-#    str(pos.transpose().flatten().tolist()),
-#]
-#data["OBJECTS"]["sphere"]["ANIMATIONS"]["quaternion"] = [
-#    time_str,
-#    str(orientation.transpose().flatten().tolist()),
-#]
-#
-#with open("ball_rolling.yaml", "w") as f:
-#    yaml.dump(data, f)
+with open("double_pendulum.yaml.in", "r") as f:
+    data = yaml.load(f, Loader=yaml.FullLoader)
+
+time_str = str(time.tolist())
+data["OBJECTS"]["pendulum_1"]["ANIMATIONS"]["position"] = [
+    time_str,
+    str(pos["p1"].transpose().flatten().tolist()),
+]
+data["OBJECTS"]["pendulum_1"]["ANIMATIONS"]["quaternion"] = [
+    time_str,
+    str(orientation["p1"].transpose().flatten().tolist()),
+]
+data["OBJECTS"]["pendulum_2"]["ANIMATIONS"]["position"] = [
+    time_str,
+    str(pos["p2"].transpose().flatten().tolist()),
+]
+data["OBJECTS"]["pendulum_2"]["ANIMATIONS"]["quaternion"] = [
+    time_str,
+    str(orientation["p2"].transpose().flatten().tolist()),
+]
+
+with open("double_pendulum.yaml", "w") as f:
+    yaml.dump(data, f)

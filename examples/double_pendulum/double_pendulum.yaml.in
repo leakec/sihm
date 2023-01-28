@@ -20,18 +20,15 @@ LIGHTS:
             - -10
 
 OBJECTS:
-    sphere:
+    pendulum_1:
         GEOMETRY:
-            FILE: sphere.obj
-        MATERIAL:
-            FILE: sphere.mtl
+            FILE: pendulum.obj
         ANIMATIONS:
             position:
             quaternion:
-    ramp:
+    pendulum_2:
         GEOMETRY:
-            FILE: Ramp.obj
-        MATERIAL:
-            FUNCTION: MeshBasicMaterial
-            ARGS:
-                - "{color: 0xffff00}"
+            FILE: pendulum.obj
+        ANIMATIONS:
+            position:
+            quaternion:
