@@ -1,0 +1,37 @@
+SCENE:
+  background: "rgb(167, 199, 231)"
+LIGHTS:
+    l1:
+        FUNCTION: HemisphereLight
+        ARGS:
+            - 0xffffff
+            - 0x444444
+        POSITION:
+            - 0
+            - 20
+            - 0
+    l2:
+        FUNCTION: DirectionalLight
+        ARGS:
+            - 0xffffff
+        POSITION:
+            - -3
+            - 10
+            - -10
+
+OBJECTS:
+    sphere:
+        GEOMETRY:
+            FILE: sphere.obj
+        MATERIAL:
+            FILE: sphere.mtl
+        ANIMATIONS:
+            position:
+            quaternion:
+    ramp:
+        GEOMETRY:
+            FILE: Ramp.obj
+        MATERIAL:
+            FUNCTION: MeshBasicMaterial
+            ARGS:
+                - "{color: 0xffff00}"
