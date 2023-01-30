@@ -2,7 +2,7 @@
 
 import os
 import click
-from typing import Any, Dict, Set
+from typing import Any, Dict, Set, Tuple
 from copy import deepcopy
 from pathlib import Path
 
@@ -126,7 +126,7 @@ def main():
         default_opts = _get_default(cli)
         options = _merge_dict(default_opts, options)
 
-    def _parse_file(cfg_file: Path, file_name: str) -> Set[str]:
+    def _parse_file(cfg_file: Path, file_name: str) -> Tuple[Set[str], Set[str]]:
         """
         Parse the file to create index.js
 
@@ -136,12 +136,17 @@ def main():
             Input config file.
         fileName : str
             Output file name.
+
+        Returns
+        -------
+        Tuple[Set[str], Set[str]]
+            Extra modules to add to the project and the set of files to transform with glslify.
         """
         from sihm.parser import SihmParser
 
         parser = SihmParser(cfg_file, file_name)
         parser.write_file()
-        return parser.extra_modules
+        return parser.extra_modules, parser.glslify_files
 
     def _make_project(directory: Path) -> None:
         """
@@ -163,7 +168,7 @@ def main():
         file_name = os.path.join(directory.resolve(), "src", "index.js")
 
         # Parse the cfg_file and create the index.js file
-        extra_modules = _parse_file(Path(cfg_file), file_name)
+        extra_modules, glslify_files = _parse_file(Path(cfg_file), file_name)
 
         # Add extra modules to the CMakeLists file
         if extra_modules:
@@ -175,6 +180,19 @@ def main():
                     ind = k
                     break
             lines[k] = 'set(EXTRA_MODULES "' + '" "'.join(extra_modules) + '")\n'
+            with open(cmake_file.resolve(), "w") as f:
+                f.write("".join(lines))
+        
+        # Add glslify files to process to CMakeLists file
+        if glslify_files:
+            cmake_file = directory.joinpath("CMakeLists.txt")
+            with open(cmake_file.resolve(), "r") as f:
+                lines = f.readlines()
+            for k, line in enumerate(lines):
+                if "set(GLSLIFY_FILES" in line:
+                    ind = k
+                    break
+            lines[k] = 'set(GLSLIFY_FILES "' + '" "'.join(glslify_files) + '")\n'
             with open(cmake_file.resolve(), "w") as f:
                 f.write("".join(lines))
 
@@ -200,11 +218,13 @@ def main():
         # Compile the project
         curr_dir = os.getcwd()
         os.chdir(project_dir)
+        os.mkdir("build")
+        os.chdir("build")
         if os.name == "nt":
             # Using windows
-            os.system('cmake . -G "MinGW Makefiles"')
+            os.system('cmake .. -G "MinGW Makefiles"')
         else:
-            os.system("cmake .")
+            os.system("cmake ..")
         os.system(f"make all -j {options['params']['jobs']}")
 
         # Copy the file to its final location

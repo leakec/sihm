@@ -150,6 +150,7 @@ render();
         self._extra_file_count: int = 0
         self._show_stats: bool = False
         self.extra_modules: Set[str] = set()
+        self.glslify_files : Set[str] = set()
 
     def __del__(self) -> None:
         self._file.close()
@@ -430,6 +431,14 @@ render();
                     # ShaderMaterial is a special case, since the user may point to files that store
                     # the vertex and fragment shader rather than passing in strings.
                     args = mat["ARGS"]
+
+                    # Add glslify transform if necessray
+                    if mat.get("USES_GLSLIFY",False):
+                        self.extra_modules.add("glslify")
+                        uses_glslify = True
+                    else:
+                        uses_glslify = False
+
                     if isinstance(args, dict):
                         vs = args.get("vertexShader", None)
                         fs = args.get("fragmentShader", None)
@@ -444,6 +453,10 @@ render();
                                     "import { " + js_name + " } from './" + js_name + "';\n"
                                 )
                                 args["vertexShader"] = js_name
+
+                                if uses_glslify:
+                                    self.glslify_files.add(js_name + ".js")
+
                         if fs is not None:
                             if "main()" not in fs:
                                 # User has given fragment shader as a file
@@ -455,11 +468,15 @@ render();
                                     "import { " + js_name + " } from './" + js_name + "';\n"
                                 )
                                 args["fragmentShader"] = js_name
+
+                                if uses_glslify:
+                                    self.glslify_files.add(js_name + ".js")
                     else:
                         raise ValueError(
                             "Arguments to ShaderMaterial must be given as a dictionary."
                         )
                     mat_args = "{" + self._processArgs(args) + "}"
+
                 else:
                     mat_args = self._processArgs(mat["ARGS"])
 
