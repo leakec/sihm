@@ -1,3 +1,7 @@
+SIHM:
+  extra_modules: 
+    - glslify 
+    - glsl-noise
 SCENE:
   background: "rgb(167, 199, 231)"
 LIGHTS:
@@ -23,6 +27,11 @@ OBJECTS:
     pendulum_1:
         GEOMETRY:
             FILE: pendulum.obj
+        MATERIAL:
+            FUNCTION: ShaderMaterial
+            ARGS:
+              fragmentShader: dummy_shader.frag
+            USES_GLSLIFY: True
         ANIMATIONS:
             position:
             quaternion:
