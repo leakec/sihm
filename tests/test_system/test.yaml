@@ -63,9 +63,18 @@ OBJECTS:
                 - 2
                 - 3
         MATERIAL:
-            FUNCTION: MeshBasicMaterial
+            FUNCTION: MeshLambertMaterial
             ARGS:
-                - "{color: 0xffff00}"
+                color: "0xff6600"
+                envMap:
+                    - ../../common/sh_f.png
+                    - ../../common/sh_b.png
+                    - ../../common/sh_u.png
+                    - ../../common/sh_d.png
+                    - ../../common/sh_r.png
+                    - ../../common/sh_l.png
+                combine: THREE.MixOperation
+                reflectivity: 0.3
         ANIMATIONS:
             position:
                 - [0, 1, 3]
