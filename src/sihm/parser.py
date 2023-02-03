@@ -644,6 +644,13 @@ render();
 
                 # Object
                 self._file.write(f"var {name} = OBJ_LOADER.parse({js_name});\n")
+                if mat and mat.get("FILE", None) is None:
+                    # Material is created separately, need to combine
+                    # TODO: Get this material to show up
+                    # self._file.write(f"{name}.customDepthMaterial = {name}_material;\n")
+                    # self._file.write(f"{name}.customDistanceMaterial = {name}_material;\n")
+                    # self._file.write(f"{name}.material = {name}_material;\n")
+                    pass
 
             # Add object to parent and get uuid
             self._file.write(f'{name}.name = "{name}"\n')
