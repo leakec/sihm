@@ -27,17 +27,36 @@ OBJECTS:
     pendulum_1:
         GEOMETRY:
             FILE: pendulum.obj
-        MATERIAL:
-            FUNCTION: ShaderMaterial
-            ARGS:
-              fragmentShader: dummy_shader.frag
-            USES_GLSLIFY: True
+              #MATERIAL: # Not currently working, need to fix glslify imports
+              #    FUNCTION: ShaderMaterial
+              #    ARGS:
+              #      fragmentShader: dummy_shader.frag
+              #    USES_GLSLIFY: True
         ANIMATIONS:
             position:
             quaternion:
     pendulum_2:
         GEOMETRY:
             FILE: pendulum.obj
+        MATERIAL:
+            FUNCTION: MeshLambertMaterial
+            ARGS:
+              color: "0x800000" 
+              refractionRatio: 0.95
         ANIMATIONS:
             position:
             quaternion:
+    dummy: # Dummy object for use while testing out materials, since we cannot add arbitrary materials to obj files yet
+        MATERIAL:
+            FUNCTION: MeshLambertMaterial
+            ARGS:
+              color: "0x800000" 
+              refractionRatio: 0.95
+        GEOMETRY:
+          FUNCTION: BoxGeometry
+          ARGS:
+              - 1
+              - 2
+              - 3
+
+
