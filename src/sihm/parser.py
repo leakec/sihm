@@ -156,7 +156,7 @@ render();
 
         self._show_stats: bool = False
         self.extra_modules: Set[str] = set()
-        self.glslify_files : Set[str] = set()
+        self.glslify_files: Set[str] = set()
 
     def __del__(self) -> None:
         self._file.close()
@@ -208,7 +208,9 @@ render();
         self._file.writelines(old_text)
         self._file.seek(curr_pos)
 
-    def _getThreeJSColor(self, color: Union[str,int, Tuple[float, float, float], List[float]]) -> str:
+    def _getThreeJSColor(
+        self, color: Union[str, int, Tuple[float, float, float], List[float]]
+    ) -> str:
         """
         Given a color in any ThreeJS form, return a string to put into a JS file.
 
@@ -222,9 +224,11 @@ render();
         str:
             Color string.
         """
-        if isinstance(color,list) or isinstance(color,tuple):
+        if isinstance(color, list) or isinstance(color, tuple):
             if len(color) != 3:
-                raise ValueError(f"Expected color iterable to be of size 3, but got {len(color)} instead.")
+                raise ValueError(
+                    f"Expected color iterable to be of size 3, but got {len(color)} instead."
+                )
             return ",".join(color)
         else:
             # Color
@@ -286,7 +290,9 @@ render();
 
         return "".join(text)
 
-    def _hashTexture(self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]) -> str:
+    def _hashTexture(
+        self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]
+    ) -> str:
         """
         Turn the file or set of files into a hash (str) deterministically.
 
@@ -302,10 +308,11 @@ render();
         """
 
         def to_string(x: Union[str, Path]) -> str:
-            if isinstance(x,str):
+            if isinstance(x, str):
                 return x
             else:
                 return str(x.resolve())
+
         if isinstance(file, str) or isinstance(file, Path):
             # Single texture
             return to_string(file)
@@ -313,11 +320,13 @@ render();
             # Cube texture
             if len(file) != 6:
                 raise ValueError(f"Got {len(file)} texture files, but I expected 1 or 6.")
-            files = [x for x in map(to_string,file)]
+            files = [x for x in map(to_string, file)]
             files.sort()
             return "".join(files)
 
-    def _addTexture(self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]) -> str:
+    def _addTexture(
+        self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]
+    ) -> str:
         """
         Add texture to scene. This supports regular textures and cube textures.
 
@@ -366,7 +375,6 @@ render();
 
         self._texture_dict[texture_hash] = name
         return name
-
 
     def _addExtraFile(self, file: Union[str, Path]) -> str:
         """
@@ -533,7 +541,7 @@ render();
                     args = mat["ARGS"]
 
                     # Add glslify transform if necessray
-                    if mat.get("USES_GLSLIFY",False):
+                    if mat.get("USES_GLSLIFY", False):
                         self.extra_modules.add("glslify")
                         uses_glslify = True
                     else:
@@ -581,7 +589,18 @@ render();
 
                 elif mat["FUNCTION"] == "MeshLambertMaterial":
                     args = mat["ARGS"]
-                    textures = ["alphaMap","aoMap","bumpMap","displacementMap","emissiveMap","envMap","lightMap","map","normalMap","specularMap"]
+                    textures = [
+                        "alphaMap",
+                        "aoMap",
+                        "bumpMap",
+                        "displacementMap",
+                        "emissiveMap",
+                        "envMap",
+                        "lightMap",
+                        "map",
+                        "normalMap",
+                        "specularMap",
+                    ]
                     colors = ["color"]
                     for k in args:
                         if k in textures:
