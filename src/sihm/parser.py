@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Any, Set, List, Union
+from typing import Dict, Any, Set, List, Union, Tuple
 from pathlib import Path
 
 
@@ -144,10 +144,16 @@ render();
         self._readData(cfg_file)
         self._file = open(fileName, "w+")
         self._path = Path(fileName.replace("index.js", ""))
+
         self._extra_imports: Set[str] = set()
         self._extra_beginning_boilerplate: Set[str] = set()
+
         self._file_dict = {}
         self._extra_file_count: int = 0
+
+        self._texture_dict = {}
+        self._extra_texture_count: int = 0
+
         self._show_stats: bool = False
         self.extra_modules: Set[str] = set()
         self.glslify_files : Set[str] = set()
@@ -202,6 +208,36 @@ render();
         self._file.writelines(old_text)
         self._file.seek(curr_pos)
 
+    def _getThreeJSColor(self, color: Union[str,int, Tuple[float, float, float], List[float]]) -> str:
+        """
+        Given a color in any ThreeJS form, return a string to put into a JS file.
+
+        Parameters
+        ----------
+        color : Union[str, int, Tuple[float, float, float], List[float, float, float]]
+            Color.
+
+        Returns
+        -------
+        str:
+            Color string.
+        """
+        if isinstance(color,list) or isinstance(color,tuple):
+            if len(color) != 3:
+                raise ValueError(f"Expected color iterable to be of size 3, but got {len(color)} instead.")
+            return ",".join(color)
+        else:
+            # Color
+            import re
+
+            regex = "^0x[A-Fa-f0-9]{6}$"
+            pattern = re.compile(regex)
+            if pattern.match(str(color)):
+                # Hex number
+                return str(color)
+            else:
+                return '"' + str(color) + '"'
+
     def _getImageURI(self, img_file: Path) -> str:
         """
         Reads the data from an image file and returns the associated URI.
@@ -249,6 +285,88 @@ render();
                 text[k] = pieces[0] + " " + self._getImageURI(img_file)
 
         return "".join(text)
+
+    def _hashTexture(self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]) -> str:
+        """
+        Turn the file or set of files into a hash (str) deterministically.
+
+        Parameters
+        ----------
+        file : Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]
+            File(s) to turn into a hash.
+
+        Returns
+        -------
+        str
+            Hash string.
+        """
+
+        def to_string(x: Union[str, Path]) -> str:
+            if isinstance(x,str):
+                return x
+            else:
+                return str(x.resolve())
+        if isinstance(file, str) or isinstance(file, Path):
+            # Single texture
+            return to_string(file)
+        else:
+            # Cube texture
+            if len(file) != 6:
+                raise ValueError(f"Got {len(file)} texture files, but I expected 1 or 6.")
+            files = [x for x in map(to_string,file)]
+            files.sort()
+            return "".join(files)
+
+    def _addTexture(self, file: Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]) -> str:
+        """
+        Add texture to scene. This supports regular textures and cube textures.
+
+        Parameters
+        ----------
+        file : Union[str, Path, List[str], Tuple[str, ...], List[Path], Tuple[Path, ...]]
+            File(s) that make up the texture.
+
+        Returns
+        -------
+        str:
+            Name of the JavaScript variable that holds the texture.
+        """
+
+        # Get unique str hash for this texture
+        texture_hash = self._hashTexture(file)
+
+        # Return if we have already turned this into a texture
+        if texture_hash in self._texture_dict:
+            return self._texture_dict[texture_hash]
+
+        # Create texture if it does not exist
+        name = f"SIHM_EXTRA_TEXTURE_{self._extra_texture_count}"
+
+        if isinstance(file, str) or isinstance(file, Path):
+            # Single texture
+            self._extra_beginning_boilerplate.add(
+                "const TEXTURE_LOADER = new THREE.TextureLoader();\n"
+            )
+            img_file = self._cfg_path.joinpath(Path(data))
+            self._file.write(
+                f'const {name} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
+            )
+        else:
+            # Cube texture
+            if len(file) != 6:
+                raise ValueError(f"Got {len(file)} texture files, but I expected 1 or 6.")
+            self._extra_beginning_boilerplate.add(
+                "const CUBE_TEXTURE_LOADER = new THREE.CubeTextureLoader();\n"
+            )
+            self._file.write(f"const {name} = CUBE_TEXTURE_LOADER.load( [\n")
+            for f in file:
+                img_file = self._cfg_path.joinpath(Path(f))
+                self._file.write(f'"{self._getImageURI(img_file)}", \n')
+            self._file.write("] );\n")
+
+        self._texture_dict[texture_hash] = name
+        return name
+
 
     def _addExtraFile(self, file: Union[str, Path]) -> str:
         """
@@ -343,38 +461,20 @@ render();
             if isinstance(data, list) or isinstance(data, tuple):
                 if len(data) == 6:
                     # Cube texture
-                    self._extra_beginning_boilerplate.add(
-                        "const CUBE_TEXTURE_LOADER = new THREE.CubeTextureLoader();\n"
-                    )
-                    self._file.write(f"scene.{prop} = CUBE_TEXTURE_LOADER.load( [\n")
-                    for file in data:
-                        img_file = self._cfg_path.joinpath(Path(file))
-                        self._file.write(f'"{self._getImageURI(img_file)}", \n')
-                    self._file.write("] );\n")
+                    texture_name = self._addTexture(data)
+                    self._file.write(f"scene.{prop} = {texture_name};\n")
                 else:
                     # Color
-                    color = ",".join(data)
+                    color = self._getThreeJSColor(data)
                     self._file.write(f"scene.{prop} = new THREE.Color({color});\n")
             elif "." in str(data):
                 # Texture
-                self._extra_beginning_boilerplate.add(
-                    "const TEXTURE_LOADER = new THREE.TextureLoader();\n"
-                )
-                img_file = self._cfg_path.joinpath(Path(data))
-                self._file.write(
-                    f'scene.{prop} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
-                )
+                texture_name = self._addTexture(data)
+                self._file.write(f"scene.{prop} = {texture_name};\n")
             else:
                 # Color
-                import re
-
-                regex = "^0x[A-Fa-f0-9]{6}$"
-                pattern = re.compile(regex)
-                if pattern.match(str(data)):
-                    # Hex number
-                    self._file.write(f"scene.{prop} = new THREE.Color({data});\n")
-                else:
-                    self._file.write(f'scene.{prop} = new THREE.Color("{data}");\n')
+                color = self._getThreeJSColor(data)
+                self._file.write(f"scene.{prop} = new THREE.Color({color});\n")
         else:
             # All other properties
             self._file.write(f"scene.{prop} = {data};\n")
@@ -471,10 +571,24 @@ render();
 
                                 if uses_glslify:
                                     self.glslify_files.add(js_name + ".js")
+
                     else:
                         raise ValueError(
                             "Arguments to ShaderMaterial must be given as a dictionary."
                         )
+
+                    mat_args = "{" + self._processArgs(args) + "}"
+
+                elif mat["FUNCTION"] == "MeshLambertMaterial":
+                    args = mat["ARGS"]
+                    textures = ["alphaMap","aoMap","bumpMap","displacementMap","emissiveMap","envMap","lightMap","map","normalMap","specularMap"]
+                    colors = ["color"]
+                    for k in args:
+                        if k in textures:
+                            args[k] = self._addTexture(args[k])
+                        elif k in colors:
+                            args[k] = self._getThreeJSColor(args[k])
+
                     mat_args = "{" + self._processArgs(args) + "}"
 
                 else:
