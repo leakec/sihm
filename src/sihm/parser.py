@@ -350,29 +350,32 @@ render();
 
         # Create texture if it does not exist
         name = f"SIHM_EXTRA_TEXTURE_{self._extra_texture_count}"
+        name_js = f"{name}.js"
+        new_file = os.path.join(self._path, name_js)
 
         if isinstance(file, str) or isinstance(file, Path):
             # Single texture
-            self._extra_beginning_boilerplate.add(
-                "const TEXTURE_LOADER = new THREE.TextureLoader();\n"
-            )
-            img_file = self._cfg_path.joinpath(Path(data))
-            self._file.write(
-                f'const {name} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
-            )
+            with open(new_file, "w") as f:
+                f.write("import { TextureLoader } from 'three';\n")
+                f.write("const TEXTURE_LOADER = new TextureLoader();\n")
+                img_file = self._cfg_path.joinpath(Path(file))
+                self._file.write(
+                    f'export const {name} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
+                )
         else:
             # Cube texture
             if len(file) != 6:
                 raise ValueError(f"Got {len(file)} texture files, but I expected 1 or 6.")
-            self._extra_beginning_boilerplate.add(
-                "const CUBE_TEXTURE_LOADER = new THREE.CubeTextureLoader();\n"
-            )
-            self._file.write(f"const {name} = CUBE_TEXTURE_LOADER.load( [\n")
-            for f in file:
-                img_file = self._cfg_path.joinpath(Path(f))
-                self._file.write(f'"{self._getImageURI(img_file)}", \n')
-            self._file.write("] );\n")
+            with open(new_file, "w") as f:
+                f.write("import { CubeTextureLoader } from 'three';\n")
+                f.write("const CUBE_TEXTURE_LOADER = new CubeTextureLoader();\n")
+                f.write(f"export const {name} = CUBE_TEXTURE_LOADER.load( [\n")
+                for dark in file:
+                    img_file = self._cfg_path.joinpath(Path(dark))
+                    f.write(f'"{self._getImageURI(img_file)}", \n')
+                f.write("] );\n")
 
+        self._extra_imports.add("import { " + name + " } from './" + name + "';\n")
         self._texture_dict[texture_hash] = name
         return name
 
