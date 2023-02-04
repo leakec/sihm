@@ -647,13 +647,15 @@ render();
 
                 # Object
                 self._file.write(f"var {name} = OBJ_LOADER.parse({js_name});\n")
+
+                # Apply material manually if it was not applied via an MTL file
                 if mat and mat.get("FILE", None) is None:
-                    # Material is created separately, need to combine
-                    # TODO: Get this material to show up
-                    # self._file.write(f"{name}.customDepthMaterial = {name}_material;\n")
-                    # self._file.write(f"{name}.customDistanceMaterial = {name}_material;\n")
-                    # self._file.write(f"{name}.material = {name}_material;\n")
-                    pass
+                    self._file.write(
+                        f"{name}.traverse( function( child )"
+                        + "{\n\tif ( child instanceof THREE.Mesh ) {\n\t\tchild.material = "
+                        + f"{name}"
+                        + "_material;\n\t}\n } );\n"
+                    )
 
             # Add object to parent and get uuid
             self._file.write(f'{name}.name = "{name}"\n')
