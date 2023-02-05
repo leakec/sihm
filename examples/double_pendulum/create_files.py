@@ -8,6 +8,7 @@ import click
 
 options = {}
 
+
 @click.group(
     name="cad",
     invoke_without_command=True,
@@ -31,6 +32,7 @@ options = {}
 def cli(ctx, **kwargs):
     options.update(kwargs)
 
+
 run = cli(standalone_mode=False)
 if isinstance(run, int):
     import sys
@@ -51,14 +53,22 @@ shaft_width = params.get("shaft_width")
 
 # Export OBJ file
 if options["export_obj"]:
+    from pathlib import Path
+
+    pendulum_obj = Path("pendulum.obj")
     body = f.getObjectsByLabel("pendulum")[0]
-    Mesh.export([body], "pendulum.obj")
+    Mesh.export([body], str(pendulum_obj.resolve()))
+
+    from sihm.utils import add_texture_coords_to_mesh
+
+    add_texture_coords_to_mesh(pendulum_obj, pendulum_obj)
 
 # Export URDF file
 if options["export_urdf"]:
     import jinja2
+
     env = jinja2.Environment()
-    with open("double_pendulum.urdf.in","r") as temp:
+    with open("double_pendulum.urdf.in", "r") as temp:
         template = env.from_string(temp.read())
 
     shape = f.getObjectsByLabel("pendulum")[0].Shape
@@ -74,15 +84,17 @@ if options["export_urdf"]:
     m = shape.Mass
     joint_loc = -(shaft_height + bob_radius)
 
-    with open("double_pendulum.urdf","w") as temp:
-        temp.write(template.render(MASS=m, B2CM=b2cm, IXX=ixx, IXY=ixy, IXZ=ixz, IYY=iyy, IYZ=iyz, IZZ=izz, JOINT_LOC=joint_loc))
-
-# Can use the command below to save the CAD part.
-# We are not saving the CAD part here, as we don't want to overwrite
-# the original in this case. That way, the next time this reg tests
-# runs, it will have the same CAD part to use.
-# f.save()
-
-# Display message about visibilty
-print("May need to toggle visibility of parts with spacebar when re-opening.")
-
+    with open("double_pendulum.urdf", "w") as temp:
+        temp.write(
+            template.render(
+                MASS=m,
+                B2CM=b2cm,
+                IXX=ixx,
+                IXY=ixy,
+                IXZ=ixz,
+                IYY=iyy,
+                IYZ=iyz,
+                IZZ=izz,
+                JOINT_LOC=joint_loc,
+            )
+        )

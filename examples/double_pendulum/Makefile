@@ -16,4 +16,4 @@ double_pendulum.urdf: pendulum.FCStd double_pendulum.urdf.in
 	python create_files.py --export-urdf
 
 clean:
-	rm -f double_pendulum.yaml double_pendulum.html pendulum.obj double_pendulum.urdf
+	rm -f double_pendulum.yaml double_pendulum.html pendulum.obj pendulum.mtl double_pendulum.urdf
