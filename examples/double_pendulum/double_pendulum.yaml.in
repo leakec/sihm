@@ -36,9 +36,12 @@ OBJECTS:
         MATERIAL: # Not currently working, need to fix glslify imports
             FUNCTION: ShaderMaterial
             ARGS:
-              fragmentShader: dummy_shader.frag
+              vertexShader: trippy_shader.vert
+              fragmentShader: trippy_shader.frag
               uniforms: 
                 time:
+              extensions:
+                derivatives: true
             USES_GLSLIFY: True
         ANIMATIONS:
             position:
