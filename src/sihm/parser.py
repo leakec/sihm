@@ -525,6 +525,8 @@ render();
 
             elif mat.get("FUNCTION", None):
 
+                material_extra_lines: List[str] = []
+
                 # Setup function arguments
                 if mat["FUNCTION"] == "ShaderMaterial":
                     # ShaderMaterial is a special case, since the user may point to files that store
@@ -570,23 +572,27 @@ render();
 
                                 if uses_glslify:
                                     self.glslify_files.add(js_name + ".js")
-                        if args.get("uniforms", {}):
-                            for uniform, val in args["uniforms"].items():
+
+                        if uniforms := args.get("uniforms", {}):
+                            for uniform, val in uniforms.items():
                                 if uniform == "time" and val is None:
                                     # Time is a special case. We will update time from the GUI.
                                     self._extra_animation_function_updates.add(
                                         f"        {name}_material.uniforms.time.value = gui.clip_action.time;"
                                     )
-                                    args["uniforms"][uniform] = 0.0
+                                    uniforms[uniform] = 0.0
 
                             def uniform_formatter(k: str, v: str) -> str:
                                 return k + ": {value: " + v + "}"
 
-                            dark = [
-                                uniform_formatter(str(k), str(v))
-                                for k, v in args["uniforms"].items()
-                            ]
+                            dark = [uniform_formatter(str(k), str(v)) for k, v in uniforms.items()]
                             args["uniforms"] = "{" + ",".join(dark) + "}"
+
+                        if extensions := args.pop("extensions", {}):
+                            for k, v in extensions.items():
+                                material_extra_lines.append(
+                                    f"{name}_material.extensions.{k} = {str(v).lower()};\n"
+                                )
 
                     else:
                         raise ValueError(
@@ -625,6 +631,9 @@ render();
                 self._file.write(
                     f"var {name}_material = new THREE.{mat['FUNCTION']}({mat_args});\n"
                 )
+
+                for line in material_extra_lines:
+                    self._file.write(line)
 
         # Geometry
         if geo:
