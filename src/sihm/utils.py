@@ -82,3 +82,41 @@ def create_skybox(img_file: Path, img_loc: ImageLoc = img_loc_default) -> None:
 
         crop = img.crop((width * col, row * height, width * (col + 1), (row + 1) * height))
         crop.save(crop_file)
+
+
+def add_texture_coords_to_mesh(input_file: Path, output_file: Path):
+    """
+    Adds texture coordinates to the input OBJ file and exports it as an output OBJ file.
+
+    Parameters
+    ----------
+    input_file : Path
+        Path to input OBJ file.
+    output_file : Path
+        Path to the output OBJ file.
+    """
+
+    import bpy
+
+    context = bpy.context
+    scene = context.scene
+    vl = context.view_layer
+
+    imported_object = bpy.ops.import_scene.obj(
+        filepath=str(input_file.resolve())
+    )  # ,global_clight_size=0.5)
+    obj = bpy.context.selected_objects[0]  ####<--Fix
+    vl.objects.active = obj
+    obj.select_set(True)
+    uv = obj.data.uv_layers.get("UVMap")
+    if not uv:
+        uv = obj.data.uv_layers.new(name="UVMap")
+    uv.active = True
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.select_all(action="SELECT")  # for all faces
+    bpy.ops.uv.smart_project(angle_limit=45, island_margin=0.02)
+    bpy.ops.object.editmode_toggle()
+
+    bpy.ops.export_scene.obj(filepath=str(output_file.resolve()), use_selection=True)
+
+    obj.select_set(False)
