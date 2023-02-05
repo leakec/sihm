@@ -32,6 +32,8 @@ foreach(FILE ${GLSLIFY_FILES})
             ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/src/${FILE} ${CMAKE_BINARY_DIR}/src/${FILE}
         COMMAND 
             ${CMAKE_BINARY_DIR}/node_modules/glslify/bin.js ${CMAKE_BINARY_DIR}/src/${FILE} -o ${CMAKE_BINARY_DIR}/src/${FILE}
+        COMMAND 
+            python ${CMAKE_SOURCE_DIR}/utils/fix_glsl_file.py -f ${CMAKE_BINARY_DIR}/src/${FILE}
         DEPENDS
             base_yarn_pkg
     )
