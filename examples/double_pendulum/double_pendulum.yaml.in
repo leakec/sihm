@@ -3,7 +3,13 @@ SIHM:
     - glslify 
     - glsl-noise
 SCENE:
-  background: "rgb(167, 199, 231)"
+    background:
+        - ../../common/tron_f.png
+        - ../../common/tron_b.png
+        - ../../common/tron_u.png
+        - ../../common/tron_d.png
+        - ../../common/tron_r.png
+        - ../../common/tron_l.png
 LIGHTS:
     l1:
         FUNCTION: HemisphereLight
@@ -27,11 +33,13 @@ OBJECTS:
     pendulum_1:
         GEOMETRY:
             FILE: pendulum.obj
-              #MATERIAL: # Not currently working, need to fix glslify imports
-              #    FUNCTION: ShaderMaterial
-              #    ARGS:
-              #      fragmentShader: dummy_shader.frag
-              #    USES_GLSLIFY: True
+        MATERIAL: # Not currently working, need to fix glslify imports
+            FUNCTION: ShaderMaterial
+            ARGS:
+              fragmentShader: dummy_shader.frag
+              uniforms: 
+                time:
+            USES_GLSLIFY: True
         ANIMATIONS:
             position:
             quaternion:
@@ -42,21 +50,14 @@ OBJECTS:
             FUNCTION: MeshLambertMaterial
             ARGS:
               color: "0x800000" 
+              envMap:
+                - ../../common/tron_f.png
+                - ../../common/tron_b.png
+                - ../../common/tron_u.png
+                - ../../common/tron_d.png
+                - ../../common/tron_r.png
+                - ../../common/tron_l.png
               refractionRatio: 0.95
         ANIMATIONS:
             position:
             quaternion:
-    dummy: # Dummy object for use while testing out materials, since we cannot add arbitrary materials to obj files yet
-        MATERIAL:
-            FUNCTION: MeshLambertMaterial
-            ARGS:
-              color: "0x800000" 
-              refractionRatio: 0.95
-        GEOMETRY:
-          FUNCTION: BoxGeometry
-          ARGS:
-              - 1
-              - 2
-              - 3
-
-
