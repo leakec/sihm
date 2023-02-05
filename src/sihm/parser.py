@@ -74,9 +74,7 @@ gui.addCameraControls(camera);
 const clock = new THREE.Clock();
 """
 
-    _ending_boilerplate = (
-        _ending_boilerplate_p1
-        + """
+    _render_loop = """
 // Render Loop
 var render = function () {
     // Render scene
@@ -85,24 +83,8 @@ var render = function () {
     renderer.render(scene, camera_per);
 };
 
-// Animation
-function animate() {
-    if (!paused) {
-        // Update animation
-        var delta = clock.getDelta();
-        mixer.update(delta);
-        gui.updateTime();
-        camera.update();
-    }
-}
-
-controls.update();
-render();
 """
-    )
-    _ending_boilerplate_stats = (
-        _ending_boilerplate_p1
-        + """
+    _render_loop_stats = """
 // Render Loop
 var render = function () {
     // Render scene
@@ -112,7 +94,9 @@ var render = function () {
     renderer.render(scene, camera_per);
     stats.end();
 };
+"""
 
+    _animation_function_p1 = """
 // Animation
 function animate() {
     if (!paused) {
@@ -120,6 +104,9 @@ function animate() {
         var delta = clock.getDelta();
         mixer.update(delta);
         gui.updateTime();
+
+"""
+    _animation_function_p2 = """
         camera.update();
     }
 }
@@ -127,7 +114,6 @@ function animate() {
 controls.update();
 render();
 """
-    )
 
     def __init__(self, cfg_file: Path, fileName: str) -> None:
         """
@@ -153,6 +139,8 @@ render();
 
         self._texture_dict = {}
         self._extra_texture_count: int = 0
+
+        self._extra_animation_function_updates: Set[str] = set()
 
         self._show_stats: bool = False
         self.extra_modules: Set[str] = set()
@@ -582,6 +570,23 @@ render();
 
                                 if uses_glslify:
                                     self.glslify_files.add(js_name + ".js")
+                        if args.get("uniforms", {}):
+                            for uniform, val in args["uniforms"].items():
+                                if uniform == "time" and val is None:
+                                    # Time is a special case. We will update time from the GUI.
+                                    self._extra_animation_function_updates.add(
+                                        f"        {name}_material.uniforms.time.value = gui.clip_action.time;"
+                                    )
+                                    args["uniforms"][uniform] = 0.0
+
+                            def uniform_formatter(k: str, v: str) -> str:
+                                return k + ": {value: " + v + "}"
+
+                            dark = [
+                                uniform_formatter(str(k), str(v))
+                                for k, v in args["uniforms"].items()
+                            ]
+                            args["uniforms"] = "{" + ",".join(dark) + "}"
 
                     else:
                         raise ValueError(
@@ -720,7 +725,25 @@ render();
         self._file.seek(0, SEEK_END)
 
         # Write ending boilerplate
+        self._file.write(self.ending_boilerplate)
+
+    @property
+    def ending_boilerplate(self) -> str:
+        """
+        Ending boilerplate for the index.js file.
+
+        Returns
+        -------
+        str:
+            Ending boilerplate for the index.js file.
+        """
+
+        eb = self._ending_boilerplate_p1
         if self._show_stats:
-            self._file.write(self._ending_boilerplate_stats)
+            eb += self._render_loop_stats
         else:
-            self._file.write(self._ending_boilerplate)
+            eb += self._render_loop
+        eb += self._animation_function_p1
+        eb += "".join(self._extra_animation_function_updates)
+        eb += self._animation_function_p2
+        return eb
