@@ -1,10 +1,10 @@
-// shay der toy: https://www.shadertoy.com/view/ctXXWn
-
-#extension GL_OES_standard_derivatives : enable
+// modified from shay der toy: https://www.shadertoy.com/view/ctXXWn
 
 precision highp float;
 
+varying vec2 vUv;
 uniform float time;
+// uniform vec2 resolution;
 
 #define saturate(x) clamp(x,0.0, 1.0)
 #define smooth(x) smoothstep(0., 1., x)
@@ -55,11 +55,9 @@ float vignette(vec2 p, float s)
 
 void main( void ) {
 
-    // Set resolution
-    vec2 resolution = (2.0, 2.0)
-
 	// Normalized pixel coordinates (from 0 to 1)
-    vec2 uv = (gl_FragCoord.xy*2.-resolution.xy)/resolution.y;
+    //vec2 uv = (gl_FragCoord.xy*2.-resolution.xy)/resolution.y;
+    vec2 uv = vUv;
 
     float v = perlinNoise(uv*2.+time*0.05, time*0.2);
     float fw = fwidth(v);
@@ -67,6 +65,6 @@ void main( void ) {
     vec3 col = (smoothstep(t, t+fw*PERIOD*2., pulse(v*PERIOD, 1.))*0.8+0.2)*vec3(0.851,0.400,1.000);
 
     // Output to screen
-    gl_FragColor = vec4(col*vignette(gl_FragCoord.xy/resolution.xy, 0.3),1.0);
+    gl_FragColor = vec4(col*vignette(uv.xy, 0.3),1.0);
 
 }
