@@ -615,7 +615,7 @@ render();
                         "normalMap",
                         "specularMap",
                     ]
-                    colors = ["color"]
+                    colors = ["color", "emissive"]
                     for k in args:
                         if k in textures:
                             args[k] = self._addTexture(args[k])
