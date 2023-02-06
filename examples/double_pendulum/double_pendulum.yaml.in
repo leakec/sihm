@@ -4,12 +4,12 @@ SIHM:
     - glsl-noise
 SCENE:
     background:
-        - ../../common/tron_f.png
-        - ../../common/tron_b.png
-        - ../../common/tron_u.png
-        - ../../common/tron_d.png
-        - ../../common/tron_r.png
-        - ../../common/tron_l.png
+        - ../../common/hot_f.png
+        - ../../common/hot_b.png
+        - ../../common/hot_u.png
+        - ../../common/hot_d.png
+        - ../../common/hot_r.png
+        - ../../common/hot_l.png
 LIGHTS:
     l1:
         FUNCTION: HemisphereLight
@@ -40,8 +40,6 @@ OBJECTS:
               fragmentShader: trippy_shader.frag
               uniforms: 
                 time:
-              extensions:
-                derivatives: true
             USES_GLSLIFY: True
         ANIMATIONS:
             position:
@@ -52,14 +50,15 @@ OBJECTS:
         MATERIAL:
             FUNCTION: MeshLambertMaterial
             ARGS:
-              color: "0x800000" 
+              color: "#FFFFFF" 
+              emissive: "#D5D4D8"
               envMap:
-                - ../../common/tron_f.png
-                - ../../common/tron_b.png
-                - ../../common/tron_u.png
-                - ../../common/tron_d.png
-                - ../../common/tron_r.png
-                - ../../common/tron_l.png
+                - ../../common/hot_f.png
+                - ../../common/hot_b.png
+                - ../../common/hot_u.png
+                - ../../common/hot_d.png
+                - ../../common/hot_r.png
+                - ../../common/hot_l.png
               refractionRatio: 0.95
         ANIMATIONS:
             position:
