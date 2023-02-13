@@ -31,7 +31,3 @@ OBJECTS:
     ramp:
         GEOMETRY:
             FILE: Ramp.obj
-        MATERIAL:
-            FUNCTION: MeshBasicMaterial
-            ARGS:
-                - "{color: 0xffff00}"

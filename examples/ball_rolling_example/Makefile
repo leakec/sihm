@@ -1,7 +1,7 @@
 all: ball_rolling.html
 
 docs: ball_rolling.html
-	cp ball_rolling.html ../../docs
+	cp ball_rolling.html ../../docs/examples
 
 ball_rolling.html : ball_rolling.yaml
 	sihm -i ball_rolling.yaml params -j 3
