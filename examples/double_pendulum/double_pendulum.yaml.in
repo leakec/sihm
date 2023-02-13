@@ -36,8 +36,8 @@ OBJECTS:
         MATERIAL: # Not currently working, need to fix glslify imports
             FUNCTION: ShaderMaterial
             ARGS:
-              vertexShader: trippy_shader.vert
-              fragmentShader: trippy_shader.frag
+              vertexShader: ../../common/3d_perlin_noise.vert
+              fragmentShader: ../../common/3d_perlin_noise.frag
               uniforms: 
                 time:
             USES_GLSLIFY: True
