@@ -59,7 +59,7 @@ OBJECTS:
                 - ../../common/hot_d.png
                 - ../../common/hot_r.png
                 - ../../common/hot_l.png
-              refractionRatio: 0.95
+              reflectivity: 0.95
         ANIMATIONS:
             position:
             quaternion:
