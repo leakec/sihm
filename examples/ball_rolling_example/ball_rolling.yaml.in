@@ -22,12 +22,12 @@ LIGHTS:
 OBJECTS:
     sphere:
         GEOMETRY:
-            FILE: sphere.obj
+            FILE: ../../common/meshes/sphere.obj
         MATERIAL:
-            FILE: sphere.mtl
+            FILE: ../../common/meshes/sphere.mtl
         ANIMATIONS:
             position:
             quaternion:
     ramp:
         GEOMETRY:
-            FILE: Ramp.obj
+            FILE: ../../common/meshes/Ramp.obj

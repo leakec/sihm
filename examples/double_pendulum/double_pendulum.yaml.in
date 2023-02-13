@@ -4,12 +4,12 @@ SIHM:
     - glsl-noise
 SCENE:
     background:
-        - ../../common/hot_f.png
-        - ../../common/hot_b.png
-        - ../../common/hot_u.png
-        - ../../common/hot_d.png
-        - ../../common/hot_r.png
-        - ../../common/hot_l.png
+        - ../../common/skyboxes/hot_f.png
+        - ../../common/skyboxes/hot_b.png
+        - ../../common/skyboxes/hot_u.png
+        - ../../common/skyboxes/hot_d.png
+        - ../../common/skyboxes/hot_r.png
+        - ../../common/skyboxes/hot_l.png
 LIGHTS:
     l1:
         FUNCTION: HemisphereLight
@@ -36,8 +36,8 @@ OBJECTS:
         MATERIAL: # Not currently working, need to fix glslify imports
             FUNCTION: ShaderMaterial
             ARGS:
-              vertexShader: ../../common/3d_perlin_noise.vert
-              fragmentShader: ../../common/3d_perlin_noise.frag
+              vertexShader: ../../common/shaders/3d_perlin_noise.vert
+              fragmentShader: ../../common/shaders/3d_perlin_noise.frag
               uniforms: 
                 time:
             USES_GLSLIFY: True
@@ -53,12 +53,12 @@ OBJECTS:
               color: "#FFFFFF" 
               emissive: "#D5D4D8"
               envMap:
-                - ../../common/hot_f.png
-                - ../../common/hot_b.png
-                - ../../common/hot_u.png
-                - ../../common/hot_d.png
-                - ../../common/hot_r.png
-                - ../../common/hot_l.png
+                - ../../common/skyboxes/hot_f.png
+                - ../../common/skyboxes/hot_b.png
+                - ../../common/skyboxes/hot_u.png
+                - ../../common/skyboxes/hot_d.png
+                - ../../common/skyboxes/hot_r.png
+                - ../../common/skyboxes/hot_l.png
               reflectivity: 0.95
         ANIMATIONS:
             position:

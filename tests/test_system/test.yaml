@@ -6,12 +6,12 @@ SIHM:
         - three # Adding a module that already exitst here just to show this option works
 SCENE:
     background:
-        - ../../common/sh_f.png
-        - ../../common/sh_b.png
-        - ../../common/sh_u.png
-        - ../../common/sh_d.png
-        - ../../common/sh_r.png
-        - ../../common/sh_l.png
+        - ../../common/skyboxes/sh_f.png
+        - ../../common/skyboxes/sh_b.png
+        - ../../common/skyboxes/sh_u.png
+        - ../../common/skyboxes/sh_d.png
+        - ../../common/skyboxes/sh_r.png
+        - ../../common/skyboxes/sh_l.png
 LIGHTS:
     l1:
         FUNCTION: HemisphereLight
@@ -42,8 +42,8 @@ OBJECTS:
         MATERIAL:
             FUNCTION: ShaderMaterial
             ARGS:
-                vertexShader: ../../common/3d_perlin_noise.vert
-                fragmentShader: ../../common/3d_perlin_noise.frag
+                vertexShader: ../../common/shaders/3d_perlin_noise.vert
+                fragmentShader: ../../common/shaders/3d_perlin_noise.frag
                 uniforms:
                     time:
             USES_GLSLIFY: True
@@ -54,9 +54,9 @@ OBJECTS:
         CHILDREN:
             sphere2:
                 GEOMETRY:
-                    FILE: ../../common/sphere.obj
+                    FILE: ../../common/meshes/sphere.obj
                 MATERIAL:
-                    FILE: ../../common/sphere.mtl
+                    FILE: ../../common/meshes/sphere.mtl
                 ANIMATIONS:
                     position:
                         - [0, 1, 2]
@@ -73,12 +73,12 @@ OBJECTS:
             ARGS:
                 color: "0xff6600"
                 envMap:
-                    - ../../common/sh_f.png
-                    - ../../common/sh_b.png
-                    - ../../common/sh_u.png
-                    - ../../common/sh_d.png
-                    - ../../common/sh_r.png
-                    - ../../common/sh_l.png
+                    - ../../common/skyboxes/sh_f.png
+                    - ../../common/skyboxes/sh_b.png
+                    - ../../common/skyboxes/sh_u.png
+                    - ../../common/skyboxes/sh_d.png
+                    - ../../common/skyboxes/sh_r.png
+                    - ../../common/skyboxes/sh_l.png
                 combine: THREE.MixOperation
                 reflectivity: 0.3
         ANIMATIONS:

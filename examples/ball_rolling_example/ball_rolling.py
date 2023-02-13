@@ -24,11 +24,11 @@ p.setGravity(0, 0, -9.81)
 
 startPos = [1.0, 0, 6.5]
 startOrientation = p.getQuaternionFromEuler([0, 0, 0])
-sphereId = p.loadURDF("sphere.urdf", startPos, startOrientation)
+sphereId = p.loadURDF("../../common/urdfs/sphere.urdf", startPos, startOrientation)
 
 startPos = [0, 0, 0]
 startOrientation = p.getQuaternionFromEuler([0, 0, 0])
-rampId = p.loadURDF("Ramp.urdf", startPos, startOrientation, useFixedBase=True)
+rampId = p.loadURDF("../../common/urdfs/Ramp.urdf", startPos, startOrientation, useFixedBase=True)
 
 # Run the sim and log data of the sphere
 k = 0
