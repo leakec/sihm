@@ -1,7 +1,7 @@
 all: double_pendulum.html
 
 docs: double_pendulum.html
-	cp double_pendulum.html ../../docs
+	cp double_pendulum.html ../../docs/examples
 
 double_pendulum.html : double_pendulum.yaml
 	sihm -i double_pendulum.yaml params -j 3
