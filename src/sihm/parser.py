@@ -4,7 +4,6 @@ from pathlib import Path
 
 
 class SihmParser:
-
     _imports = """
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -253,7 +252,6 @@ render();
         return "data:image/" + suffix + ";base64," + encoded_string.decode("utf-8")
 
     def _readMtlFile(self, file: str) -> str:
-
         """
         Reads the data of an MTL file, and embeds any images as base64.
 
@@ -524,7 +522,6 @@ render();
                 self._file.write(f"OBJ_LOADER.setMaterials(MTL_LOADER.parse({js_name}));\n")
 
             elif mat.get("FUNCTION", None):
-
                 material_extra_lines: List[str] = []
 
                 # Setup function arguments
@@ -601,27 +598,78 @@ render();
 
                     mat_args = "{" + self._processArgs(args) + "}"
 
-                elif (
-                    mat["FUNCTION"] == "MeshLambertMaterial"
-                    or mat["FUNCTION"] == "MeshStandardMaterial"
-                ):
+                elif mat["FUNCTION"] in [
+                    "Material",
+                    "MeshPhongMaterial",
+                    "MeshLambertMaterial",
+                    "MeshStandardMaterial",
+                    "MeshPhysicalMaterial",
+                ]:
                     args = mat["ARGS"]
-                    textures = [
-                        "alphaMap",
-                        "aoMap",
-                        "bumpMap",
-                        "displacementMap",
-                        "emissiveMap",
-                        "envMap",
-                        "lightMap",
-                        "map",
-                        "normalMap",
-                        "specularMap",
-                    ]
-                    colors = ["color", "emissive"]
 
-                    if mat["FUNCTION"] == "MeshStandardMaterial":
-                        textures += ["metalnessMap", "roughnessMap"]
+                    textures = []
+                    colors = []
+
+                    if mat["FUNCTION"] == "MeshLambertMaterial":
+                        textures += [
+                            "alphaMap",
+                            "aoMap",
+                            "bumpMap",
+                            "displacementMap",
+                            "emissiveMap",
+                            "envMap",
+                            "lightMap",
+                            "map",
+                            "normalMap",
+                            "specularMap",
+                        ]
+                        colors += ["color", "emissive"]
+
+                    if mat["FUNCTION"] == "MeshPhongMaterial":
+                        textures += [
+                            "alphaMap",
+                            "aoMap",
+                            "bumpMap",
+                            "displacementMap",
+                            "emissiveMap",
+                            "envMap",
+                            "lightMap",
+                            "map",
+                            "normalMap",
+                            "specularMap",
+                        ]
+                        colors += ["color", "emissive"]
+
+                    if mat["FUNCTION"] in ["MeshStandardMaterial", "MeshPhysicalMaterial"]:
+                        textures += [
+                            "alphaMap",
+                            "aoMap",
+                            "bumpMap",
+                            "dislacementMap",
+                            "emissiveMap",
+                            "envMap",
+                            "lightMap",
+                            "map",
+                            "metalnessMap",
+                            "normalMap",
+                            "roughnessMap",
+                            "specularMap",
+                        ]
+                        colors += ["color", "emissive"]
+
+                    if mat["FUNCTION"] == "MeshPhysicalMaterial":
+                        textures += [
+                            "clearcoatMap",
+                            "clearcoatNormalMap",
+                            "clearcoatRoughnessMap",
+                            "sheenRoughnessMap",
+                            "sheenColorMap",
+                            "specularIntensityMap",
+                            "specularColorMap",
+                            "thicknessMap",
+                            "transmissionMap",
+                        ]
+                        colors += ["attenuationColor", "sheenColor", "specularColor"]
 
                     for k in args:
                         if k in textures:
