@@ -601,7 +601,10 @@ render();
 
                     mat_args = "{" + self._processArgs(args) + "}"
 
-                elif mat["FUNCTION"] == "MeshLambertMaterial":
+                elif (
+                    mat["FUNCTION"] == "MeshLambertMaterial"
+                    or mat["FUNCTION"] == "MeshStandardMaterial"
+                ):
                     args = mat["ARGS"]
                     textures = [
                         "alphaMap",
@@ -616,6 +619,10 @@ render();
                         "specularMap",
                     ]
                     colors = ["color", "emissive"]
+
+                    if mat["FUNCTION"] == "MeshStandardMaterial":
+                        textures += ["metalnessMap", "roughnessMap"]
+
                     for k in args:
                         if k in textures:
                             args[k] = self._addTexture(args[k])
