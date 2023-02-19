@@ -91,9 +91,9 @@ def add_texture_coords_to_mesh(input_file: Path, output_file: Path):
     Parameters
     ----------
     input_file : Path
-        Path to input OBJ file.
+        Path to input mesh file.
     output_file : Path
-        Path to the output OBJ file.
+        Path to the output mesh file.
     """
 
     import bpy
@@ -117,6 +117,43 @@ def add_texture_coords_to_mesh(input_file: Path, output_file: Path):
     bpy.ops.uv.smart_project(angle_limit=45, island_margin=0.02)
     bpy.ops.object.editmode_toggle()
 
+    bpy.ops.export_scene.obj(filepath=str(output_file.resolve()), use_selection=True)
+
+    obj.select_set(False)
+
+
+def smooth_mesh(input_file: Path, output_file: Path):
+    """
+    Smooths mesh using blender by recalculating normals.
+
+    Parameters
+    ----------
+    input_file : Path
+        Path to input mesh file.
+    output_file : Path
+        Path to the output mesh file.
+    """
+
+    import bpy
+
+    # Setup
+    context = bpy.context
+    scene = context.scene
+    vl = context.view_layer
+
+    # Import
+    imported_object = bpy.ops.import_scene.obj(
+        filepath=str(input_file.resolve())
+    )  # ,global_clight_size=0.5)
+    obj = bpy.context.selected_objects[0]  ####<--Fix
+    vl.objects.active = obj
+    obj.select_set(True)
+
+    # Smoothing
+    for f in obj.data.polygons:
+        f.use_smooth = True
+
+    # Export
     bpy.ops.export_scene.obj(filepath=str(output_file.resolve()), use_selection=True)
 
     obj.select_set(False)
