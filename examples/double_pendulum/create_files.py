@@ -3,7 +3,7 @@ FREECADPATH = "/usr/lib64/freecad/lib64"
 import sys
 
 sys.path.append(FREECADPATH)
-import FreeCAD, Mesh
+import FreeCAD, Mesh, MeshPart
 import click
 
 options = {}
@@ -57,11 +57,13 @@ if options["export_obj"]:
 
     pendulum_obj = Path("pendulum.obj")
     body = f.getObjectsByLabel("pendulum")[0]
-    Mesh.export([body], str(pendulum_obj.resolve()))
+    msh = MeshPart.meshFromShape(Shape=body.Shape, MaxLength=0.1)
+    msh.write(str(pendulum_obj.resolve()))
 
-    from sihm.utils import add_texture_coords_to_mesh
+    from sihm.utils import add_texture_coords_to_mesh, clean_mesh
 
     add_texture_coords_to_mesh(pendulum_obj, pendulum_obj)
+    clean_mesh(pendulum_obj, pendulum_obj)
 
 # Export URDF file
 if options["export_urdf"]:

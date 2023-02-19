@@ -10,24 +10,24 @@ SCENE:
         - ../../common/skyboxes/hot_d.png
         - ../../common/skyboxes/hot_r.png
         - ../../common/skyboxes/hot_l.png
-LIGHTS:
-    l1:
-        FUNCTION: HemisphereLight
-        ARGS:
-            - 0xffffff
-            - 0x444444
-        POSITION:
-            - 0
-            - 20
-            - 0
-    l2:
-        FUNCTION: DirectionalLight
-        ARGS:
-            - 0xffffff
-        POSITION:
-            - -3
-            - 10
-            - -10
+          #LIGHTS:
+          #    l1:
+          #        FUNCTION: HemisphereLight
+          #        ARGS:
+          #            - 0xffffff
+          #            - 0x444444
+          #        POSITION:
+          #            - 0
+          #            - 20
+          #            - 0
+          #    l2:
+          #        FUNCTION: DirectionalLight
+          #        ARGS:
+          #            - 0xffffff
+          #        POSITION:
+          #            - -3
+          #            - 10
+          #            - -10
 
 OBJECTS:
     pendulum_1:
@@ -48,10 +48,10 @@ OBJECTS:
         GEOMETRY:
             FILE: pendulum.obj
         MATERIAL:
-            FUNCTION: MeshLambertMaterial
+            FUNCTION: MeshStandardMaterial
             ARGS:
               color: "#FFFFFF" 
-              emissive: "#D5D4D8"
+              emissive: "#000000"
               envMap:
                 - ../../common/skyboxes/hot_f.png
                 - ../../common/skyboxes/hot_b.png
@@ -59,7 +59,10 @@ OBJECTS:
                 - ../../common/skyboxes/hot_d.png
                 - ../../common/skyboxes/hot_r.png
                 - ../../common/skyboxes/hot_l.png
-              reflectivity: 0.95
+              reflectivity: 1.0
+              roughness: 0.0
+              metalness: 1.0
+              flatShading: "true"
         ANIMATIONS:
             position:
             quaternion:
