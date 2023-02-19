@@ -122,9 +122,9 @@ def add_texture_coords_to_mesh(input_file: Path, output_file: Path):
     obj.select_set(False)
 
 
-def smooth_mesh(input_file: Path, output_file: Path):
+def clean_mesh(input_file: Path, output_file: Path):
     """
-    Smooths mesh using blender by recalculating normals.
+    Cleans mesh using blender by removing doubles and recalculating normals.
 
     Parameters
     ----------
@@ -149,9 +149,11 @@ def smooth_mesh(input_file: Path, output_file: Path):
     vl.objects.active = obj
     obj.select_set(True)
 
-    # Smoothing
-    for f in obj.data.polygons:
-        f.use_smooth = True
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.remove_doubles()
+    bpy.ops.mesh.normals_make_consistent()
+    bpy.ops.object.editmode_toggle()
 
     # Export
     bpy.ops.export_scene.obj(filepath=str(output_file.resolve()), use_selection=True)
