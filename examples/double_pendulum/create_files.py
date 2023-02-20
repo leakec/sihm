@@ -56,14 +56,14 @@ if options["export_obj"]:
     from pathlib import Path
 
     pendulum_obj = Path("pendulum.obj")
+    pendulum_nm = Path("pendulum_normal_map.png")
     body = f.getObjectsByLabel("pendulum")[0]
     msh = MeshPart.meshFromShape(Shape=body.Shape, MaxLength=0.1)
     msh.write(str(pendulum_obj.resolve()))
 
-    from sihm.utils import add_texture_coords_to_mesh, clean_mesh
+    from sihm.utils import create_normal_map
 
-    add_texture_coords_to_mesh(pendulum_obj, pendulum_obj)
-    clean_mesh(pendulum_obj, pendulum_obj)
+    create_normal_map(pendulum_obj, pendulum_obj, pendulum_nm)
 
 # Export URDF file
 if options["export_urdf"]:

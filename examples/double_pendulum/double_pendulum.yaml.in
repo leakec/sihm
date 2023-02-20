@@ -63,6 +63,7 @@ OBJECTS:
               roughness: 0.0
               metalness: 1.0
               flatShading: "true"
+              normalMap: ./pendulum_normal_map.png
         ANIMATIONS:
             position:
             quaternion:
