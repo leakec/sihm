@@ -345,7 +345,7 @@ render();
                 f.write("import { TextureLoader } from 'three';\n")
                 f.write("const TEXTURE_LOADER = new TextureLoader();\n")
                 img_file = self._cfg_path.joinpath(Path(file))
-                self._file.write(
+                f.write(
                     f'export const {name} = TEXTURE_LOADER.load("{self._getImageURI(img_file)}");\n'
                 )
         else:
@@ -363,6 +363,7 @@ render();
 
         self._extra_imports.add("import { " + name + " } from './" + name + "';\n")
         self._texture_dict[texture_hash] = name
+        self._extra_texture_count += 1
         return name
 
     def _addExtraFile(self, file: Union[str, Path]) -> str:
