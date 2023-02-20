@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Union, Tuple, TypedDict
+from typing import List, Union, Tuple, TypedDict, Optional
 
 
 class ImageLoc(TypedDict):
@@ -159,3 +159,125 @@ def clean_mesh(input_file: Path, output_file: Path):
     bpy.ops.export_scene.obj(filepath=str(output_file.resolve()), use_selection=True)
 
     obj.select_set(False)
+
+
+def create_normal_map(
+    input_mesh: Path,
+    output_mesh: Path,
+    output_normal_map: Path,
+    input_high_poly_mesh: Optional[Path] = None,
+    extrusion: float = 0.1,
+):
+    """
+    Creates a normal map for a low-poly mesh in Blender using a high-poly mesh. If
+    no high-poly mesh is provided, then Blender's shade-smooth is used as the high-
+    poly mesh.
+
+    Parameters
+    ----------
+    input_mesh: Path
+        Path to input mesh file.
+    output_mesh: Path
+        Path to output mesh file.
+    output_normal_map: Path
+        Path to the output normal map.
+    input_high_poly_mesh: Optional[Path]
+        Path to the high poly mesh file.
+    extrusion: float
+        Extrusion distance used.
+    """
+
+    import bpy
+
+    # Setup blender
+    context = bpy.context
+    scene = context.scene
+    vl = context.view_layer
+
+    # Import low-poly mesh
+    imported_object = bpy.ops.import_scene.obj(
+        filepath=str(input_mesh.resolve())
+    )  # ,global_clight_size=0.5)
+    low_poly_obj = bpy.context.selected_objects[0]
+    vl.objects.active = low_poly_obj
+    low_poly_obj.select_set(True)
+
+    # Select all faces in a mesh
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.select_all(action="SELECT")
+
+    # Create UV coordinates using smart_project
+    bpy.ops.uv.smart_project()
+
+    # Deselect all faces
+    bpy.ops.mesh.select_all(action="DESELECT")
+    bpy.ops.object.editmode_toggle()
+
+    # Add image texture to material
+    mat = bpy.context.active_object.material_slots[0].material
+    mat.use_nodes = True
+    material_output = mat.node_tree.nodes.get("Material Output")
+    principled_BSDF = mat.node_tree.nodes.get("Principled BSDF")
+
+    name = output_normal_map.name
+    bpy.ops.image.new(name=name, width=1024, height=1024, alpha=False)
+    tex_image = bpy.data.images[name]
+    tex_node = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    tex_node.image = tex_image
+
+    # Deselect low-poly mesh
+    low_poly_obj.select_set(False)
+
+    # Import second file
+    if input_high_poly_mesh:
+        imported_object = bpy.ops.import_scene.obj(
+            filepath=str(input_high_poly_mesh.resolve())
+        )  # ,global_clight_size=0.5)
+        high_poly_obj = bpy.context.selected_objects[0]
+        vl.objects.active = high_poly_obj
+        high_poly_obj.select_set(True)
+
+        # Select all faces in a mesh
+        bpy.ops.object.editmode_toggle()
+        bpy.ops.mesh.select_all(action="SELECT")
+
+        # Create UV coordinates using smart_project
+        bpy.ops.uv.smart_project()
+
+        # Deselect
+        bpy.ops.mesh.select_all(action="DESELECT")
+        bpy.ops.object.editmode_toggle()
+
+    else:
+        # Copy object
+        vl.objects.active = low_poly_obj
+        low_poly_obj.select_set(True)
+
+        high_poly_obj = low_poly_obj.copy()
+        high_poly_obj.data = low_poly_obj.data.copy()
+        bpy.context.collection.objects.link(high_poly_obj)
+
+        low_poly_obj.select_set(False)
+
+        # Set shading to smooth
+        vl.objects.active = high_poly_obj
+        high_poly_obj.select_set(True)
+        bpy.ops.object.shade_smooth()
+
+    # Bake texture to image
+    bpy.context.scene.render.engine = "CYCLES"
+    high_poly_obj.select_set(True)
+    vl.objects.active = low_poly_obj
+    bpy.ops.object.bake(
+        type="NORMAL",
+        use_selected_to_active=True,
+        filepath=str(output_normal_map.resolve()),
+        cage_extrusion=extrusion,
+    )
+
+    # Export mesh and image
+    vl.objects.active = low_poly_obj
+    low_poly_obj.select_set(True)
+    bpy.ops.export_scene.obj(filepath=str(output_mesh.resolve()), use_selection=True)
+
+    tex_image.save(filepath=str(output_normal_map.resolve()))
