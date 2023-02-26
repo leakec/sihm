@@ -10,7 +10,7 @@ void main() {
     vec3 v = vec3(pHat.x + time * 0.5,
                   pHat.y + time * 0.3,
                   pHat.z + time * 0.8);
-    float val = 10.0 + noise3(v) * 1.0;
+    float val = 10.0 + noise3(v) * 2.0;
     vec3 pNew = pHat*val;
     gl_Position = projectionMatrix * modelViewMatrix * vec4( pNew, 1.0 );
 

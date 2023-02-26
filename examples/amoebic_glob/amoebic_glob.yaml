@@ -16,7 +16,7 @@ OBJECTS:
                 fragmentShader: ./amoeba.frag
                 uniforms:
                     time:
-                    utexture1: ./stars.jpg
+                    utexture1: ./colorful_noise.png
             USES_GLSLIFY: True
         ANIMATIONS:
             position:
