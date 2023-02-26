@@ -1,8 +1,10 @@
 # Import FreeCAD
-FREECADPATH = "/usr/lib64/freecad/lib64"
+FREECADPATH = "/usr/lib64/freecad/lib64"  # Fedora
+FREECADPATH2 = "/usr/lib/freecad/lib"  # Ubuntu
 import sys
 
 sys.path.append(FREECADPATH)
+sys.path.append(FREECADPATH2)
 import FreeCAD, Mesh, MeshPart
 import click
 
