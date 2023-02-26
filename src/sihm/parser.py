@@ -579,6 +579,19 @@ render();
                                         f"        {name}_material.uniforms.time.value = gui.clip_action.time;"
                                     )
                                     uniforms[uniform] = 0.0
+                                elif (im_path := self._cfg_path.joinpath(Path(val))).exists():
+                                    if im_path.suffix in (
+                                        ".png",
+                                        ".jpg",
+                                        ".jpeg",
+                                        ".tiff",
+                                        ".bmp",
+                                        ".gif",
+                                    ):
+                                        # If this is an image file, we assume the user is setting a texture.
+                                        # Add this to the list of textures and set as uniform.
+                                        texture_name = self._addTexture(str(im_path.resolve()))
+                                        uniforms[uniform] = texture_name
 
                             def uniform_formatter(k: str, v: str) -> str:
                                 return k + ": {value: " + v + "}"
