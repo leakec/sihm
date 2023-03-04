@@ -1,0 +1,24 @@
+SIHM:
+    extra_modules:
+        - glslify
+        - glsl-noise
+OBJECTS:
+    amoebic_glob:
+        GEOMETRY:
+            FUNCTION: IcosahedronGeometry
+            ARGS:
+                - 10
+                - 10
+        MATERIAL:
+            FUNCTION: ShaderMaterial
+            ARGS:
+                vertexShader: ./amoeba.vert
+                fragmentShader: ./amoeba.frag
+                uniforms:
+                    time:
+                    utexture1: ./colorful_noise.png
+            USES_GLSLIFY: True
+        ANIMATIONS:
+            position:
+                - [0, 10]
+                - [0, 0, 0, 0, 0, 0]

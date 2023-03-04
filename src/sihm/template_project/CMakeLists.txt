@@ -1,8 +1,11 @@
 project(SIHM_Project)
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.17)
+
+# Copying this so it doesn't stay in main directory
+file(COPY cmake/CMakeGraphVizOptions.cmake DESTINATION ${CMAKE_BINARY_DIR})
 
 # Source Java files
-FILE(GLOB SRC_JS_FILES src/*.js)
+FILE(GLOB SRC_JS_FILES ${CMAKE_SOURCE_DIR}/src/*.js)
 
 # Main target
 add_custom_target(index_html ALL
@@ -36,6 +39,7 @@ foreach(FILE ${GLSLIFY_FILES})
             python ${CMAKE_SOURCE_DIR}/utils/fix_glsl_file.py -f ${CMAKE_BINARY_DIR}/src/${FILE}
         DEPENDS
             base_yarn_pkg
+            ${CMAKE_SOURCE_DIR}/src/${FILE}
     )
     LIST(APPEND GLSLIFY_OUTPUT_FILES ${CMAKE_BINARY_DIR}/src/${FILE})
 endforeach()
@@ -70,6 +74,8 @@ add_custom_command(
         yarn webpack
     DEPENDS
         yarn_pkg
+    DEPENDS
+        ${SRC_JS_FILES}
 )
 
 # Command to build base yarn package

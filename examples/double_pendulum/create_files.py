@@ -1,8 +1,12 @@
 # Import FreeCAD
-FREECADPATH = "/usr/lib64/freecad/lib64"
+FREECADPATHS = [
+    "/usr/lib64/freecad/lib64",  # Fedora
+    "/usr/lib/freecad-python3/lib",  # Ubuntu
+]
 import sys
 
-sys.path.append(FREECADPATH)
+for path in FREECADPATHS:
+    sys.path.append(path)
 import FreeCAD, Mesh, MeshPart
 import click
 
@@ -39,7 +43,7 @@ if isinstance(run, int):
 
     sys.exit(run)
 
-# Load hollow_cylinder file
+# Load pendulum file
 filename = "pendulum.FCStd"
 f = FreeCAD.open(filename)
 
