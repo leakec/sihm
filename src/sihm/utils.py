@@ -7,7 +7,7 @@ class ImageLoc(TypedDict):
     Determines the location of the 6 images in the skybox image.
     Imagine the sky box broken into 12 segments number from left to right
     and top to bottom. These 12 segments are zero indexed. For example,
-    the upper left segemnt is 0, and the right-most middle segment is 8.
+    the upper left segemnt is 0, and the right-most middle segment is 7.
 
     Parameters
     ----------
