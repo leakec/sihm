@@ -1,5 +1,86 @@
 from pathlib import Path
-from typing import List, Union, Tuple, TypedDict, Optional
+from typing import List, Union, Tuple, TypedDict, Optional, Any
+import numpy as np
+from numpy.typing import NDArray
+
+
+def lerp(from_val: NDArray[Any], to_val: NDArray[Any], t: NDArray[Any]) -> NDArray[Any]:
+    """
+    Linearly interpolate (lerp).
+
+    Parameters
+    ----------
+    from_val : NDArray[Any]
+        From value in the lerp.
+    to_val : NDArray[Any]
+        To value in the lerp.
+    t : NDArray[Any]
+        The "t" value to use in the lerp.
+
+    Returns
+    -------
+    NDArray[Any]
+        Linearly interpolated values.
+    """
+    return (1.0 - t) * from_val + t * to_val
+
+
+def inv_lerp(from_val: NDArray[Any], to_val: NDArray[Any], val: NDArray[Any]) -> NDArray[Any]:
+    """
+    Inverse lerp function.
+
+    Parameters
+    ----------
+    from_val : NDArray[Any]
+        From value in the inverse lerp.
+    to_val : NDArray[Any]
+        To value in the inverse lerp.
+    val : NDArray[Any]
+        The value to perform the inverse lerp on.
+
+    Returns
+    -------
+    NDArray[Any]
+        Array of the "t" values for the inverse lerp.
+    """
+    dark = (val - from_val) / (to_val - from_val)
+    mask = from_val == to_val
+    if np.any(mask):
+        mask = np.isnan(dark)
+        dark[mask] = np.broadcast_to(from_val, dark.shape)[mask]
+    return dark
+
+
+def remap(
+    from_val_1: NDArray[Any],
+    from_val_2: NDArray[Any],
+    to_val_1: NDArray[Any],
+    to_val_2: NDArray[Any],
+    val: NDArray[Any],
+) -> NDArray[Any]:
+    """
+    Remap function. Takes a range from from_val_1 to from_val_2 and maps it to
+    to_val_1 to to_val_2.
+
+    Parameters
+    ----------
+    from_val_1 : NDArray[Any]
+        Lower portion of the values to map from.
+    from_val_2 : NDArray[Any]
+        Upper portion of the values to map from.
+    to_val_1 : NDArray[Any]
+        Lower portion of the values to map to.
+    to_val_2 : NDArray[Any]
+        Upper portion of the values to map to.
+    val : NDArray[Any]
+        The values to remap.
+
+    Returns
+    -------
+    NDArray[Any]
+        Remapped values.
+    """
+    return lerp(to_val_1, to_val_2, inv_lerp(from_val_1, from_val_2, val))
 
 
 class ImageLoc(TypedDict):
