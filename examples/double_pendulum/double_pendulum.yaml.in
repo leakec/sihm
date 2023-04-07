@@ -4,12 +4,12 @@ SIHM:
     - glsl-noise
 SCENE:
     background:
-        - ../../common/skyboxes/hot_f.png
-        - ../../common/skyboxes/hot_b.png
-        - ../../common/skyboxes/hot_u.png
-        - ../../common/skyboxes/hot_d.png
-        - ../../common/skyboxes/hot_r.png
-        - ../../common/skyboxes/hot_l.png
+        - ../../common/skyboxes/tron_f.png
+        - ../../common/skyboxes/tron_b.png
+        - ../../common/skyboxes/tron_u.png
+        - ../../common/skyboxes/tron_d.png
+        - ../../common/skyboxes/tron_r.png
+        - ../../common/skyboxes/tron_l.png
           #LIGHTS:
           #    l1:
           #        FUNCTION: HemisphereLight
@@ -53,12 +53,12 @@ OBJECTS:
               color: "#FFFFFF" 
               emissive: "#000000"
               envMap:
-                - ../../common/skyboxes/hot_f.png
-                - ../../common/skyboxes/hot_b.png
-                - ../../common/skyboxes/hot_u.png
-                - ../../common/skyboxes/hot_d.png
-                - ../../common/skyboxes/hot_r.png
-                - ../../common/skyboxes/hot_l.png
+                - ../../common/skyboxes/tron_f.png
+                - ../../common/skyboxes/tron_b.png
+                - ../../common/skyboxes/tron_u.png
+                - ../../common/skyboxes/tron_d.png
+                - ../../common/skyboxes/tron_r.png
+                - ../../common/skyboxes/tron_l.png
               reflectivity: 1.0
               roughness: 0.0
               metalness: 1.0
