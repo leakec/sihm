@@ -22,6 +22,8 @@ Examples of `sihm`'s output can be found [here](https://leakec.github.io/sihm).
 
 ## Installation
 
+Installing just the `sihm` Python package via `pip install sihm` will give you access to all the functionality of `sihm` (provided you install the system dependencies yourself). However, if you also want tab-completion for common shell programs such as bash or zsh, then you should consider installing the `sihm` package via your package manager (this will also take care of installing system dependencies so you don't have to worry about it yourself). 
+
 ### Linux
 
 -   Install the python package: `pip install sihm`
