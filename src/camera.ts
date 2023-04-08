@@ -54,9 +54,9 @@ export class MyCamera {
                 var wp = new THREE.Vector3();
                 this.follow_obj.getWorldPosition(wp);
                 this.camera.position.addVectors(wp, this.follow_obj_offset);
+                this.camera.lookAt(this.follow_obj.position); // Works for follow w/o change in rotation
             }
             //this.camera.quaternion.equals(this.follow_obj.quaternion);
-            this.camera.lookAt(this.follow_obj.position); // Works for follow w/o change in rotation
         }
     }
 }
