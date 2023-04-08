@@ -1,0 +1,11 @@
+# FreeCAD v0.20 build2 Arch module
+# https://www.freecadweb.org
+newmtl color_red
+Kd 1.0 0.0 0.0
+Tr 0.0
+newmtl color_green
+Kd 0.0 1.0 0.0
+Tr 0.0
+newmtl color_blue
+Kd 0.0 0.0 1.0
+Tr 0.0

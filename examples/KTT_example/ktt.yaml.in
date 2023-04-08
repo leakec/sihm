@@ -1,15 +1,35 @@
 SCENE:
     background:
-        - ../../common/skyboxes/tron_f.png
-        - ../../common/skyboxes/tron_b.png
-        - ../../common/skyboxes/tron_u.png
-        - ../../common/skyboxes/tron_d.png
-        - ../../common/skyboxes/tron_r.png
-        - ../../common/skyboxes/tron_l.png
+        - ../../common/skyboxes/sh_f.png
+        - ../../common/skyboxes/sh_b.png
+        - ../../common/skyboxes/sh_u.png
+        - ../../common/skyboxes/sh_d.png
+        - ../../common/skyboxes/sh_r.png
+        - ../../common/skyboxes/sh_l.png
+LIGHTS:
+    l1:
+        FUNCTION: HemisphereLight
+        ARGS:
+            - 0xffffff
+            - 0x444444
+        POSITION:
+            - 0
+            - 20
+            - 0
+    l2:
+        FUNCTION: DirectionalLight
+        ARGS:
+            - 0xffffff
+        POSITION:
+            - -3
+            - 10
+            - -10
 OBJECTS:
     f0:
         GEOMETRY:
             FILE: axis_system.obj
+        MATERIAL:
+            FILE: axis_system.mtl
         ANIMATIONS:
             position: 
               - [0.0]
@@ -20,12 +40,16 @@ OBJECTS:
     f1:
         GEOMETRY:
             FILE: axis_system.obj
+        MATERIAL:
+            FILE: axis_system.mtl
         ANIMATIONS:
             position:
             quaternion:
     f2:
         GEOMETRY:
             FILE: axis_system.obj
+        MATERIAL:
+            FILE: axis_system.mtl
         ANIMATIONS:
             position:
             quaternion:
