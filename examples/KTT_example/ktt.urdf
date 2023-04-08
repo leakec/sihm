@@ -1,0 +1,79 @@
+<robot name="ktt">
+  <link name="world"/>
+  <link name="f1">
+    <inertial>
+      <!-- center of mass (com) is defined w.r.t. link local coordinate system -->
+      <mass value="1.0" />
+      <origin xyz="0.0, 0.0, 0.0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <mesh filename="axis_system.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <!-- No collision shape -->
+      <geometry>
+        <box size="0 0 0"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="f2">
+    <inertial>
+      <!-- center of mass (com) is defined w.r.t. link local coordinate system -->
+      <mass value="1.0" />
+      <origin xyz="0.0, 0.0, 0.0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <mesh filename="axis_system.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <!-- No collision shape -->
+      <geometry>
+        <box size="0 0 0"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="f3">
+    <inertial>
+      <!-- center of mass (com) is defined w.r.t. link local coordinate system -->
+      <mass value="1.0" />
+      <origin xyz="0.0, 0.0, 0.0" /> 
+      <inertia  ixx="1.0" ixy="0.0"  ixz="0.0"  iyy="1.0"  iyz="0.0"  izz="1.0" />
+    </inertial>
+	<visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+         <mesh filename="axis_system.obj" scale="1 1 1"/>
+      </geometry>
+    </visual>
+    <collision>
+      <!-- No collision shape -->
+      <geometry>
+        <box size="0 0 0"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="f1_joint" type="floating">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <parent link="world"/>
+      <child link="f1"/>
+  </joint>
+  <joint name="f2_joint" type="floating">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <parent link="f1"/>
+      <child link="f2"/>
+  </joint>
+  <joint name="f3_joint" type="floating">
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+      <parent link="f2"/>
+      <child link="f3"/>
+  </joint>
+
+</robot>

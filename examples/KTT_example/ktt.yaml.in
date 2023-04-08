@@ -1,0 +1,31 @@
+SCENE:
+    background:
+        - ../../common/skyboxes/tron_f.png
+        - ../../common/skyboxes/tron_b.png
+        - ../../common/skyboxes/tron_u.png
+        - ../../common/skyboxes/tron_d.png
+        - ../../common/skyboxes/tron_r.png
+        - ../../common/skyboxes/tron_l.png
+OBJECTS:
+    f0:
+        GEOMETRY:
+            FILE: axis_system.obj
+        ANIMATIONS:
+            position: 
+              - [0.0]
+              - [0.0, 0.0, 0.0]
+            quaternion: 
+              - [0.0]
+              - [0.0, 0.0, 0.0, 1.0]
+    f1:
+        GEOMETRY:
+            FILE: axis_system.obj
+        ANIMATIONS:
+            position:
+            quaternion:
+    f2:
+        GEOMETRY:
+            FILE: axis_system.obj
+        ANIMATIONS:
+            position:
+            quaternion:
