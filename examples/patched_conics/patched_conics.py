@@ -26,7 +26,6 @@ dv_1 = v_d_p - v_r  # Delta v for transfer ellipse
 
 v_d_a = np.sqrt(mu_m * (2 / a_f - 1 / a_d))  # Velocity when coming in on transfer ellipse
 v_f = -np.sqrt(mu_m / a_f)  # Desired final velocity
-dv_2 = v_f - v_d_a
 T_f = 2 * np.pi * np.sqrt(a_f**3 / mu_m)  # Final orbit period
 
 # Figure out times
@@ -86,7 +85,6 @@ while t_int[1] < t[2]:
     rec["p_r"][:, k] = S[0:3]
     t_int += dt
     k += 1
-# S[4] += dv_2
 while t_int[1] < t[3]:
     S = integrate.odeint(dS, S, t_int)[1, :]
     rec["t"][k] = t_int[1]
