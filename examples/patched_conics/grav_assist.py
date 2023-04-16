@@ -29,7 +29,7 @@ v_f = -np.sqrt(mu_m / a_f)  # Desired final velocity
 T_f = 2 * np.pi * np.sqrt(a_f**3 / mu_m)  # Final orbit period
 
 # Figure out times
-t_rel = [0.0, 2.0 * T_r, T_d / 2.0, 2.0 * T_f]  # Times of movements (relative to previous time)
+t_rel = [0.0, 2.0 * T_r, T_d / 2.0, T_f]  # Times of movements (relative to previous time)
 t = np.zeros_like(t_rel)  # Times of movements (absolute)
 for k in range(1, len(t_rel)):
     t[k] = t_rel[k] + t[k - 1]
