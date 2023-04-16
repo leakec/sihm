@@ -1,0 +1,67 @@
+#SIHM:
+#  extra_modules: 
+#    - glslify 
+#    - glsl-noise
+SCENE:
+  background: "rgb(167, 199, 231)"
+LIGHTS:
+  l1:
+      FUNCTION: HemisphereLight
+      ARGS:
+          - 0xffffff
+          - 0x444444
+      POSITION:
+          - 0
+          - 20
+          - 0
+  l2:
+      FUNCTION: DirectionalLight
+      ARGS:
+          - 0xffffff
+      POSITION:
+          - -3
+          - 10
+          - -10
+
+OBJECTS:
+    rocket:
+        GEOMETRY:
+            FUNCTION: SphereGeometry
+            ARGS:
+                - 0.1
+                - 30
+                - 30
+        MATERIAL:
+            FUNCTION: MeshLambertMaterial
+            ARGS:
+              color: "0xff6600"
+        ANIMATIONS:
+            position:
+    earth:
+        GEOMETRY:
+            FUNCTION: SphereGeometry
+            ARGS:
+                - 0.3
+                - 30
+                - 30
+        MATERIAL:
+            FUNCTION: MeshLambertMaterial
+            ARGS:
+              color: "0x0000ff"
+        ANIMATIONS:
+            position:
+              - [0.0]
+              - [0.0, 0.0, 0.0]
+    moon:
+        GEOMETRY:
+            FUNCTION: SphereGeometry
+            ARGS:
+                - 0.1
+                - 30
+                - 30
+        MATERIAL:
+            FUNCTION: MeshLambertMaterial
+            ARGS:
+              color: "0x888888"
+        ANIMATIONS:
+            position:
