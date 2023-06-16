@@ -10,7 +10,7 @@ double_pendulum.yaml: double_pendulum.yaml.in double_pendulum.py double_pendulum
 	python double_pendulum.py
 
 pendulum.obj: pendulum.FCStd
-	python create_files.py --export-obj
+	python3.10 create_files.py --export-obj
 
 double_pendulum.urdf: pendulum.FCStd double_pendulum.urdf.in
 	python create_files.py --export-urdf
